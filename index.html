@@ -179,7 +179,7 @@
     <footer class="footer">
       <span>☯ DAO OF ETERNITY</span>
       <span>Setiap bintang menyimpan sebuah Dao.</span>
-      <button id="cheatToggleBtn" class="developer-toggle" aria-expanded="false" aria-controls="developerPanel">✦ Mode Pengembang</button>
+      <button type="button" id="cheatToggleBtn" class="developer-toggle" aria-expanded="false" aria-controls="developerPanel" onclick="(function(btn){var panel=document.getElementById('developerPanel');var opening=panel.hidden;panel.hidden=!opening;btn.setAttribute('aria-expanded',String(opening));btn.textContent=opening?'✦ Tutup Mode Pengembang':'✦ Mode Pengembang';if(opening){panel.scrollIntoView({behavior:'auto',block:'nearest'});}})(this)">✦ Mode Pengembang</button>
       <section id="developerPanel" class="developer-panel" hidden>
         <div class="section-heading"><div><label>LOCAL SANDBOX</label><h2>Panel Cheat</h2></div><span class="section-icon">⚡</span></div>
         <p class="section-copy">Masukkan password untuk membuka fitur pengembang.</p>

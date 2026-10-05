@@ -379,3 +379,6 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .cheat-login-message { min-height:16px; margin:0; color:#e9b8b8; font-size:12px; }
 .developer-lock { margin-top:12px; padding:8px 0; border:0; background:transparent; color:#c9b77f; font-size:12px; text-decoration:underline; }
 #cheatTools[hidden], #cheatLoginForm[hidden] { display:none !important; }
+
+/* Mobile tap reliability for developer panel */
+.developer-toggle { position:relative; z-index:5; pointer-events:auto; touch-action:manipulation; cursor:pointer; }
