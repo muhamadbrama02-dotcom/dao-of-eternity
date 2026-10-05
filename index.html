@@ -12,6 +12,21 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="cinematic-letterbox cinematic-top" aria-hidden="true"></div>
+  <div class="cinematic-letterbox cinematic-bottom" aria-hidden="true"></div>
+  <div class="donghua-cinematic" id="donghuaCinematic" aria-hidden="true">
+    <div class="cinematic-sky"></div>
+    <div class="cinematic-moon"></div>
+    <div class="cinematic-cloud cloud-a"></div><div class="cinematic-cloud cloud-b"></div>
+    <div class="cinematic-runes">☯　✦　道　✧　☯</div>
+    <div class="cinematic-burst-ring"></div>
+    <div class="cinematic-caption">
+      <small id="cinematicKicker">HEAVENLY ASCENSION</small>
+      <strong id="cinematicTitle">Terobosan</strong>
+      <span id="cinematicSubtitle">Langit bergetar menyaksikan kelahiran seorang kultivator.</span>
+    </div>
+    <button class="cinematic-skip" id="cinematicSkip" type="button">Lewati Adegan</button>
+  </div>
   <div class="starfield" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="#" aria-label="Dao of Eternity beranda">
@@ -19,7 +34,7 @@
       <span><strong>DAO OF ETERNITY</strong><small>THE PATH BEYOND HEAVEN</small></span>
     </a>
     <div class="save-state"><i></i><span id="saveStatus">Tersimpan</span></div>
-    <button class="icon-button" id="soundlessMark" title="Lambang Dao" aria-label="Lambang Dao">✧</button>
+    <button class="donghua-mode" id="donghuaMode" type="button" aria-pressed="true">✦ DONGHUA</button><button class="icon-button" id="soundlessMark" title="Lambang Dao" aria-label="Lambang Dao">✧</button>
   </header>
 
   <main class="page">
@@ -28,7 +43,7 @@
       <div class="hero-row">
         <div>
           <h1>Jalan Menuju<br><em>Puncak Keabadian</em></h1>
-          <p class="hero-copy">Langit membatasi yang fana. Dao menanti mereka yang berani melampauinya.</p>
+          <p class="hero-copy">Langit membatasi yang fana. Dao menanti mereka yang berani melampauinya.</p><div class="donghua-status"><span class="status-pulse"></span><span id="sceneNarration">Episode I · Napas pertama menuju Dao</span></div>
         </div>
         <div class="dao-seal" aria-hidden="true"><span>道</span><i></i><b>✦</b></div>
       </div>
@@ -53,6 +68,12 @@
       <article class="stat-card panel"><div class="stat-top"><label>ESENSI DAO</label><span class="stat-symbol gold">◇</span></div><strong id="essenceStat">20</strong><small>Dao Essence</small></article>
       <article class="stat-card panel"><div class="stat-top"><label>KULTIVASI</label><span class="stat-symbol violet">✦</span></div><strong id="powerStat">3</strong><small>Tingkat kekuatan</small></article>
       <article class="stat-card panel"><div class="stat-top"><label>USIA SPIRITUAL</label><span class="stat-symbol mint">⌁</span></div><strong id="ageStat">31</strong><small>Tahun fana</small></article>
+    </section>
+
+    <section class="donghua-episode" id="donghuaEpisode">
+      <div><span>☯</span><small>THE IMMORTAL CHRONICLE</small><strong id="episodeTitle">Episode I · The First Breath</strong></div>
+      <div class="episode-progress"><span id="episodeProgress"></span></div>
+      <em id="episodeQuote">“Jika langit menutup jalan, aku akan menciptakan jalanku sendiri.”</em>
     </section>
 
     <section class="panel section-card inner-world">

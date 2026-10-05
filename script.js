@@ -72,6 +72,41 @@
     {glow:"#c3a2ff",robe:"#a586e5"}, {glow:"#fff1bd",robe:"#e7d38b"},
     {glow:"#ffffff",robe:"#d9c9ff"}
   ];
+  const realmDonghua = [
+    {episode:"Episode I · The First Breath",quote:"“Jika langit menutup jalan, aku akan menciptakan jalanku sendiri.”",narration:"Napas pertama menyatu dengan denyut bintang.",title:"Awal Jalan Dao"},
+    {episode:"Episode II · Spirit Foundation",quote:"“Tubuh hanyalah perahu. Kehendak adalah kemudinya.”",narration:"Fondasi spiritual mulai berakar di dalam dantian.",title:"Fondasi Spiritual"},
+    {episode:"Episode III · Crimson Core",quote:"“Satu inti lahir. Seribu kemungkinan terbuka.”",narration:"Inti emas berputar, memantulkan cahaya dari langit malam.",title:"Inti Kultivasi"},
+    {episode:"Episode IV · Reborn Soul",quote:"“Jiwa tidak tunduk pada kematian.”",narration:"Jiwa baru lahir menatap dunia dengan mata yang berbeda.",title:"Jiwa Baru Lahir"},
+    {episode:"Episode V · Spirit Transformation",quote:"“Dagingku berubah, tetapi Dao-ku tidak tergoyahkan.”",narration:"Roh dan tubuh mulai menyatu dengan hukum langit.",title:"Transformasi Roh"},
+    {episode:"Episode VI · One With Dao",quote:"“Aku tidak mencari Dao. Aku menjadi bagian darinya.”",narration:"Hukum alam bergerak mengikuti satu pikiran.",title:"Penyatuan Dao"},
+    {episode:"Episode VII · Heavenly Tribulation",quote:"“Turunkan petirmu. Aku akan menjawab dengan tekad.”",narration:"Awan kesengsaraan berkumpul di atas kepala sang kultivator.",title:"Kesengsaraan Surgawi"},
+    {episode:"Episode VIII · True Immortal",quote:"“Keabadian hanyalah awal.”",narration:"Batas dunia fana retak di hadapan langkahmu.",title:"Keabadian Sejati"},
+    {episode:"Episode IX · Immortal King",quote:"“Seribu sekte tunduk pada satu kehendak.”",narration:"Aura raja abadi mengguncang sembilan langit.",title:"Raja Abadi"},
+    {episode:"Episode X · Dao Emperor",quote:"“Langit bukan lagi atasku.”",narration:"Kaisar Dao membuka mata di antara bintang-bintang.",title:"Kaisar Dao"},
+    {episode:"Final Episode · Beyond Heaven",quote:"“Aku tidak akan berhenti di puncak. Aku akan melampauinya.”",narration:"Pintu Dao terbuka. Tidak ada lagi langit yang mampu membatasi langkahmu.",title:"Puncak Dao"}
+  ];
+  let donghuaEnabled=true, cinematicTimer=null;
+  function updateDonghuaUI(){
+    const r=realmDonghua[Math.min(state.realm,realmDonghua.length-1)];
+    const scene=$("meditationScene");
+    if(scene){ scene.dataset.realm=String(state.realm); scene.style.setProperty("--stage-depth", String(Math.min(1.5,1+state.realm*.045))); }
+    if($("episodeTitle")) $("episodeTitle").textContent=r.episode;
+    if($("episodeQuote")) $("episodeQuote").textContent=r.quote;
+    if($("sceneNarration")) $("sceneNarration").textContent=r.narration;
+    if($("donghuaMode")){ $("donghuaMode").setAttribute("aria-pressed",String(donghuaEnabled)); $("donghuaMode").textContent=donghuaEnabled?"✦ DONGHUA":"◌ DONGHUA LITE"; document.body.classList.toggle("donghua-lite",!donghuaEnabled); }
+    if($("episodeProgress")) $("episodeProgress").style.width=((state.realm/(realms.length-1))*100)+"%";
+  }
+  function playCinematic(kind, oldRealm, newRealm){
+    if(!donghuaEnabled || !$("donghuaCinematic")) return;
+    const box=$("donghuaCinematic"), r=realmDonghua[Math.min(newRealm,realmDonghua.length-1)];
+    $("cinematicKicker").textContent=kind==="trial"?"HEAVEN'S TRIAL":newRealm===realms.length-1?"BEYOND HEAVEN":"HEAVENLY ASCENSION";
+    $("cinematicTitle").textContent=kind==="trial"?"Kesengsaraan Surgawi":r.title;
+    $("cinematicSubtitle").textContent=kind==="trial"?"Petir surgawi turun. Tekadmu menjawabnya.":r.narration;
+    box.classList.remove("show","trial-scene","final-scene"); void box.offsetWidth;
+    box.classList.add("show"); if(kind==="trial") box.classList.add("trial-scene"); if(newRealm===realms.length-1) box.classList.add("final-scene");
+    clearTimeout(cinematicTimer); cinematicTimer=setTimeout(closeCinematic,4200);
+  }
+  function closeCinematic(){ const box=$("donghuaCinematic"); if(box) box.classList.remove("show","trial-scene","final-scene"); }
   function updateCultivatorAura(){
     const scene=$("meditationScene");
     if(!scene)return;
@@ -90,6 +125,7 @@
   }
   function render(){
     updateCultivatorAura();
+    updateDonghuaUI();
     $("realmName").textContent=realmLabel();$("realmStage").textContent=stageLabel();
     $("qiStat").textContent=Math.floor(state.qi).toLocaleString("id-ID");$("essenceStat").textContent=state.essence.toLocaleString("id-ID");
     $("powerStat").textContent=Math.floor(state.power).toLocaleString("id-ID");$("ageStat").textContent=state.age>=999999?"Tak Terukur":state.age.toLocaleString("id-ID");
@@ -204,6 +240,7 @@
       if(beast){beast.classList.remove("beast-awaken");void beast.offsetWidth;beast.classList.add("beast-awaken");window.setTimeout(()=>beast.classList.remove("beast-awaken"),2200);}
       const scene2=$("meditationScene");
       if(scene2 && state.realm>=4){scene2.classList.remove("dao-ascension");void scene2.offsetWidth;scene2.classList.add("dao-ascension");window.setTimeout(()=>scene2.classList.remove("dao-ascension"),2200); }
+      playCinematic("breakthrough", oldRealm, state.realm);
       addLog(`Terobosan berhasil! ${realms[oldRealm].name} tahap ${oldStage} telah dilampaui.`);
       notify("Terobosan berhasil! Aura dan jubahmu berevolusi.");
     }else{
@@ -219,6 +256,7 @@
     sceneEffect("trial-burst",650);spawnQiParticles(10,true);
     state.trialAvailable=false;
     if(success){
+      playCinematic("trial", state.realm, state.realm);
       const reward=15+state.realm*8;state.essence+=reward;state.essenceEarned+=reward;state.power+=5+state.realm*3;
       state.age+=Math.max(5,state.realm*12);state.inventory.artifact++;
       addLog(`Kesengsaraan surgawi ditaklukkan! Kamu memperoleh ${reward} Esensi Dao dan satu Fragmen Artefak.`);
@@ -329,6 +367,11 @@
     state.ownedTechniques=techniques.map(t=>t.id);
   }));
 
+  $("donghuaMode").addEventListener("click",()=>{ donghuaEnabled=!donghuaEnabled; updateDonghuaUI(); notify(donghuaEnabled?"Mode Donghua aktif — efek sinematik dinyalakan.":"Mode Donghua Lite — hemat baterai."); });
+  $("cinematicSkip").addEventListener("click",closeCinematic);
+  // Parallax ringan untuk layar sentuh/gyro-like movement tanpa meminta permission sensor.
+  let px=0,py=0;
+  document.addEventListener("pointermove",e=>{ if(!donghuaEnabled)return; px=(e.clientX/innerWidth-.5)*2; py=(e.clientY/innerHeight-.5)*2; document.documentElement.style.setProperty("--parallax-x",(px*6).toFixed(2)+"px"); document.documentElement.style.setProperty("--parallax-y",(py*4).toFixed(2)+"px"); },{passive:true});
   $("meditateBtn").addEventListener("click",meditate);
   $("breakthroughBtn").addEventListener("click",breakthrough);
   $("trialBtn").addEventListener("click",faceTrial);
