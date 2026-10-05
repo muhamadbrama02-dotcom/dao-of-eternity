@@ -1,186 +1,212 @@
-"use strict";
-
-const SAVE_KEY = "daoOfEternity_v1";
-
-const REALMS = [
-  {name:"Pemurnian Tubuh",title:"Mortal Wanderer",qi:100,power:1},
-  {name:"Pengumpulan Qi",title:"Qi Seeker",qi:180,power:3},
-  {name:"Pendirian Fondasi",title:"Foundation Adept",qi:300,power:7},
-  {name:"Inti Emas",title:"Golden Core Cultivator",qi:500,power:15},
-  {name:"Jiwa Baru",title:"Nascent Soul Adept",qi:800,power:32},
-  {name:"Transformasi Dewa",title:"Divine Transformer",qi:1200,power:70},
-  {name:"Pemurnian Kekosongan",title:"Void Walker",qi:1800,power:150},
-  {name:"Penyatuan Dao",title:"Dao Ascendant",qi:2600,power:320},
-  {name:"Dewa Sejati",title:"True Immortal",qi:3600,power:700},
-  {name:"Kaisar Abadi",title:"Immortal Emperor",qi:5000,power:1500},
-  {name:"Puncak Dao",title:"Eternal Dao Sovereign",qi:7000,power:9999}
-];
-
-const TECHNIQUES = [
-  {id:"breath",name:"Pernapasan Embun Surgawi",description:"Teknik dasar untuk menyerap energi spiritual.",icon:"❋",cost:0,gain:10},
-  {id:"lotus",name:"Teratai Jiwa Abadi",description:"Memperkuat meditasi dan penyerapan Qi.",icon:"✿",cost:40,gain:20},
-  {id:"star",name:"Sutra Bintang Purba",description:"Menghubungkan jiwa dengan energi galaksi.",icon:"✦",cost:120,gain:40},
-  {id:"dao",name:"Hukum Dao Tanpa Batas",description:"Teknik legendaris yang melampaui batas fana.",icon:"☯",cost:300,gain:80}
-];
-
-const MISSIONS = [
-  {id:"meditate",name:"Menenangkan Hati",description:"Bermeditasi sebanyak 5 kali.",target:5,reward:15},
-  {id:"gather",name:"Mengumpulkan Qi",description:"Kumpulkan 100 Qi sepanjang perjalanan.",target:100,reward:20},
-  {id:"breakthrough",name:"Melampaui Batas",description:"Berhasil melakukan terobosan ranah.",target:1,reward:15}
-];
-
-function createDefaultState(){return{qi:0,essence:0,realm:0,stage:1,age:18,meditations:0,breakthroughs:0,totalQiGathered:0,trialsWon:0,techniques:["breath"],missions:{meditate:0,gather:0,breakthrough:0},claimedMissions:[],completedMissions:[],log:[{title:"Awal Perjalanan",text:"Jiwamu terbangun di antara bintang. Jalan Dao menantimu.",time:Date.now()}],lastDailyReset:new Date().toDateString()};}
-function clampInteger(value,min,max){const number=Math.floor(Number(value)||min);return Math.min(max,Math.max(min,number));}
-function loadState(){
-  try{
-    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return createDefaultState();
-    const saved=JSON.parse(raw),fresh=createDefaultState();
-    const result={...fresh,...saved,missions:{...fresh.missions,...(saved.missions||{})},
-      techniques:Array.isArray(saved.techniques)?saved.techniques.filter(id=>TECHNIQUES.some(t=>t.id===id)):["breath"],
-      claimedMissions:Array.isArray(saved.claimedMissions)?saved.claimedMissions:[],
-      completedMissions:Array.isArray(saved.completedMissions)?saved.completedMissions:[],
-      log:Array.isArray(saved.log)?saved.log.slice(0,30):fresh.log};
-    result.realm=clampInteger(result.realm,0,REALMS.length-1);result.stage=clampInteger(result.stage,1,9);
-    result.qi=Math.max(0,Number(result.qi)||0);result.essence=Math.max(0,Number(result.essence)||0);result.age=Math.max(18,Number(result.age)||18);
-    return result;
-  }catch(error){console.warn("Data save tidak dapat dibaca.",error);return createDefaultState();}
-}
-
-let state=loadState(),toastTimeout=null,visualEffectsEnabled=true;
-const $=id=>document.getElementById(id);
-function currentRealm(){return REALMS[state.realm];}
-function qiRequired(){return currentRealm().qi;}
-function hasTechnique(id){return state.techniques.includes(id);}
-function meditationGain(){return Math.round(state.techniques.reduce((sum,id)=>{const t=TECHNIQUES.find(item=>item.id===id);return sum+(t?t.gain:0);},0)*(1+state.realm*.1));}
-function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));$("save-status").textContent="Tersimpan";}catch(error){$("save-status").textContent="Gagal menyimpan";console.warn("Penyimpanan gagal.",error);}}
-function addLog(title,text){state.log.unshift({title,text,time:Date.now()});state.log=state.log.slice(0,20);}
-function showToast(message){const toast=$("toast");toast.textContent=message;toast.classList.add("show");if(toastTimeout)clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>toast.classList.remove("show"),2600);}
-function trialChance(){return Math.min(95,70+state.realm*2+(state.stage-1));}
-
-function renderStats(){
-  const realm=currentRealm(),required=qiRequired(),progress=Math.min(100,state.qi/required*100);
-  $("player-title").textContent=realm.title;$("realm-name").textContent=realm.name;
-  $("realm-stage").textContent=`Tahap ${state.stage} · ${state.stage===1?"Awal":state.stage>=8?"Puncak":"Berkembang"}`;
-  $("qi-value").textContent=Math.floor(state.qi).toLocaleString("id-ID");$("essence-value").textContent=Math.floor(state.essence).toLocaleString("id-ID");
-  $("power-value").textContent=realm.power.toLocaleString("id-ID");$("age-value").textContent=state.age.toLocaleString("id-ID");
-  $("progress-text").textContent=`${Math.floor(state.qi).toLocaleString("id-ID")} / ${required.toLocaleString("id-ID")} Qi`;
-  $("progress-percent").textContent=`${Math.floor(progress)}%`;$("qi-progress").style.width=`${progress}%`;
-  $("meditate-gain").textContent=`+${meditationGain()} Qi`;$("breakthrough-btn").disabled=state.qi<required||state.realm>=REALMS.length-1;
-  $("cultivation-hint").textContent=state.realm>=REALMS.length-1?"Puncak Dao telah tercapai.":state.qi>=required?"Qi telah mencapai batas. Saatnya mencoba terobosan ranah!":`Butuh ${Math.max(0,required-Math.floor(state.qi)).toLocaleString("id-ID")} Qi lagi untuk mencapai batas ranah.`;
-  $("trial-level").textContent=state.realm===0?"Ujian Fana":`Ujian Ranah ${state.realm+1}`;
-  $("trial-chance").textContent=`${trialChance()}%`;$("trial-btn").disabled=state.qi<30;
-  $("trial-hint").textContent=state.qi<30?"Kamu membutuhkan minimal 30 Qi untuk menghadapi ujian.":"Biaya ujian: 30 Qi. Kemenangan memberikan Esensi Dao.";
-  $("scene-caption").textContent=state.realm>=9?"Hukum alam semesta tunduk pada kehendakmu...":state.realm>=5?"Jiwamu beresonansi dengan galaksi...":"Dengarkan napas alam semesta...";
-  $("destiny-text").textContent=state.realm>=10?"Kamu telah mencapai Puncak Dao. Di luar keabadian, masih adakah jalan yang belum dijelajahi?":state.realm>=6?"Bintang-bintang mulai mengenali jiwamu. Namun, rahasia tertinggi Dao masih tersembunyi.":state.realm>=3?"Fondasi kekuatanmu semakin kokoh. Ujian berikutnya akan menentukan arah takdirmu.":"Jalan seribu li dimulai dengan satu langkah. Kumpulkan Qi, dan bukalah gerbang takdirmu.";
-}
-
-function renderTechniques(){
-  const container=$("techniques-list");container.replaceChildren();
-  TECHNIQUES.forEach(technique=>{
-    const owned=hasTechnique(technique.id),card=document.createElement("div");card.className="technique-card";
-    const icon=document.createElement("div");icon.className="technique-icon";icon.textContent=technique.icon;
-    const info=document.createElement("div");info.className="technique-info";
-    const title=document.createElement("strong");title.textContent=technique.name;
-    const description=document.createElement("small");description.textContent=owned?`${technique.description} ${technique.id==="breath"?"":"+ "+technique.gain+" Qi per meditasi."}`:`${technique.description} Harga: ${technique.cost} Esensi.`;
-    info.append(title,description);const button=document.createElement("button");button.textContent=owned?"Dikuasai":"Pelajari";button.disabled=owned||state.essence<technique.cost;
-    button.addEventListener("click",()=>learnTechnique(technique.id));card.append(icon,info,button);container.append(card);
+(() => {
+  "use strict";
+  const SAVE_KEY = "daoOfEternityV2";
+  const realms = [
+    {name:"Pengumpulan Qi", stages:9, base:180, power:3, age:31},
+    {name:"Fondasi Spiritual", stages:9, base:420, power:12, age:55},
+    {name:"Pembentukan Inti", stages:9, base:850, power:28, age:120},
+    {name:"Jiwa Baru Lahir", stages:9, base:1600, power:60, age:300},
+    {name:"Transformasi Roh", stages:9, base:3000, power:120, age:700},
+    {name:"Penyatuan Dao", stages:9, base:5400, power:260, age:1500},
+    {name:"Kesengsaraan Surgawi", stages:9, base:9500, power:550, age:3000},
+    {name:"Keabadian Sejati", stages:9, base:17000, power:1200, age:8000},
+    {name:"Raja Abadi", stages:9, base:30000, power:2800, age:20000},
+    {name:"Kaisar Dao", stages:9, base:52000, power:6500, age:80000},
+    {name:"Puncak Dao", stages:1, base:100000, power:15000, age:999999}
+  ];
+  const techniques = [
+    {id:"breath",name:"Pernapasan Bintang",icon:"✧",desc:"Menyelaraskan napas dengan arus Qi kosmik.",gain:4,cost:0},
+    {id:"meridian",name:"Pembukaan Meridian",icon:"⌁",desc:"Membuka jalur energi untuk memperkuat meditasi.",gain:8,cost:35},
+    {id:"moon",name:"Sutra Bulan Perak",icon:"☾",desc:"Menyerap cahaya bulan dan memurnikan esensi.",gain:15,cost:90},
+    {id:"void",name:"Langkah Kekosongan",icon:"◈",desc:"Teknik kuno yang menembus batas ruang.",gain:25,cost:220},
+    {id:"heaven",name:"Kitab Langit Tanpa Batas",icon:"道",desc:"Sebuah warisan yang konon berasal dari Dao pertama.",gain:45,cost:500}
+  ];
+  const missions = [
+    {id:"meditate",name:"Tenangkan Pikiran",desc:"Bermeditasi sebanyak 10 kali.",target:10,reward:15,type:"meditations"},
+    {id:"essence",name:"Kumpulkan Esensi",desc:"Kumpulkan 50 Esensi Dao sepanjang perjalanan.",target:50,reward:20,type:"essenceEarned"},
+    {id:"fight",name:"Pemburu Roh",desc:"Menangkan 3 pertarungan.",target:3,reward:25,type:"wins"},
+    {id:"break",name:"Melampaui Batas",desc:"Berhasil melakukan 1 terobosan.",target:1,reward:30,type:"breakthroughs"}
+  ];
+  const enemyTypes = [
+    {name:"Serigala Kabut",icon:"☄",power:4,reward:8},
+    {name:"Gagak Bayangan",icon:"✦",power:8,reward:13},
+    {name:"Iblis Batu",icon:"◆",power:15,reward:22},
+    {name:"Ular Bintang",icon:"🐉",power:24,reward:35},
+    {name:"Penjaga Gerbang",icon:"♜",power:40,reward:55}
+  ];
+  const freshState = () => ({
+    qi:0, essence:20, totalQi:0, power:3, age:31, realm:0, stage:1,
+    meditations:0, wins:0, breakthroughs:0, essenceEarned:0,
+    ownedTechniques:["breath"], inventory:{pill:2,charm:1,artifact:0},
+    missionsClaimed:[], sect:"Pengelana Tanpa Sekte", sectJoined:false,
+    trialAvailable:false, logs:[], enemyIndex:0, enemyHp:100, lastVisit:Date.now()
   });
-}
-
-function renderMissions(){
-  const container=$("missions-list");container.replaceChildren();let claimedCount=0;
-  MISSIONS.forEach(mission=>{
-    const progress=mission.id==="gather"?Math.min(mission.target,state.totalQiGathered):Math.min(mission.target,state.missions[mission.id]||0);
-    const claimed=state.claimedMissions.includes(mission.id),completed=progress>=mission.target;if(claimed)claimedCount++;
-    const item=document.createElement("div");item.className=`mission-item${claimed?" completed":""}`;
-    const check=document.createElement("div");check.className="mission-check";check.textContent=claimed?"✓":completed?"!":"·";
-    const copy=document.createElement("div");copy.className="mission-copy";const title=document.createElement("strong");title.textContent=mission.name;
-    const description=document.createElement("small");description.textContent=claimed?"Hadiah telah diterima":completed?`Selesai! Klaim +${mission.reward} Esensi`:`${mission.description} (${progress}/${mission.target})`;
-    copy.append(title,description);item.append(check,copy);
-    if(completed&&!claimed){const claim=document.createElement("button");claim.className="text-button";claim.textContent="Klaim";claim.addEventListener("click",()=>claimMission(mission.id));item.append(claim);}
-    container.append(item);
-  });
-  $("mission-count").textContent=`${claimedCount}/${MISSIONS.length}`;
-}
-
-function renderLog(){
-  const container=$("log-list");container.replaceChildren();
-  state.log.slice(0,6).forEach(entry=>{
-    const item=document.createElement("div");item.className="log-entry";const title=document.createElement("strong");title.textContent=entry.title;
-    const description=document.createElement("p");description.textContent=entry.text;const time=document.createElement("time");
-    time.dateTime=new Date(entry.time).toISOString();time.textContent=new Date(entry.time).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
-    item.append(title,description,time);container.append(item);
-  });
-}
-function render(){renderStats();renderTechniques();renderMissions();renderLog();}
-
-function meditate(){
-  const gain=meditationGain(),previousQi=state.qi;state.qi=Math.min(qiRequired(),state.qi+gain);const actualGain=state.qi-previousQi;
-  if(actualGain<=0){showToast("Qi sudah mencapai batas ranah. Cobalah terobosan!");return;}
-  state.meditations++;state.totalQiGathered+=actualGain;state.missions.meditate++;
-  addLog("Meditasi Spiritual",`Kamu menyerap ${actualGain} Qi dari energi alam semesta.`);showToast(`Meditasi berhasil! +${actualGain} Qi Spiritual`);
-  if(visualEffectsEnabled){const meditator=document.querySelector(".meditator");if(meditator)meditator.animate([{transform:"scale(1)",filter:"brightness(1)"},{transform:"scale(1.15)",filter:"brightness(1.8)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:550,easing:"ease-out"});}
-  checkMissionProgress();render();saveState();
-}
-
-function breakthrough(){
-  if(state.qi<qiRequired()){showToast("Qi belum mencukupi untuk terobosan.");return;}
-  if(state.realm>=REALMS.length-1){showToast("Kamu telah mencapai Puncak Dao!");return;}
-  const chance=Math.min(95,72+state.realm*2+(state.stage-1)),success=Math.random()*100<chance;
-  if(success){
-    const oldRealm=currentRealm().name;state.qi=0;state.realm++;state.stage=1;state.breakthroughs++;state.essence+=15+state.realm*5;state.age+=10+state.realm*3;state.missions.breakthrough++;
-    addLog("Terobosan Berhasil!",`${oldRealm} telah dilampaui. Kamu mencapai ${currentRealm().name}.`);showToast(`Terobosan berhasil! Ranah baru: ${currentRealm().name}`);
-  }else{
-    const lost=Math.floor(qiRequired()*.25);state.qi=Math.max(0,state.qi-lost);
-    addLog("Terobosan Gagal",`Energi spiritual bergejolak. Kamu kehilangan ${lost} Qi.`);showToast(`Terobosan gagal. ${lost} Qi hilang. Tenangkan jiwamu.`);
+  let state = loadState();
+  let toastTimer;
+  const $ = id => document.getElementById(id);
+  function loadState(){
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+      if(saved && typeof saved === "object") return {...freshState(),...saved, inventory:{...freshState().inventory,...(saved.inventory||{})}};
+    } catch(e) {}
+    return freshState();
   }
-  checkMissionProgress();render();saveState();
-}
-
-function faceTribulation(){
-  if(state.qi<30){showToast("Qi tidak cukup untuk menghadapi kesengsaraan.");return;}
-  state.qi-=30;const chance=trialChance(),success=Math.random()*100<chance;
-  if(success){const reward=15+state.realm*10;state.essence+=reward;state.trialsWon++;addLog("Kesengsaraan Ditaklukkan",`Petir surgawi berhasil dilalui. Kamu memperoleh ${reward} Esensi Dao.`);showToast(`Ujian berhasil! +${reward} Esensi Dao`);}
-  else{const lost=Math.min(state.qi,15+state.realm*3);state.qi-=lost;addLog("Dihantam Petir Surgawi",`Ujian gagal. Kamu kehilangan ${lost} Qi tambahan.`);showToast("Petir surgawi menghantam tubuhmu. Persiapkan dirimu kembali.");}
-  render();saveState();
-}
-
-function learnTechnique(id){
-  const technique=TECHNIQUES.find(item=>item.id===id);if(!technique||hasTechnique(id))return;
-  if(state.essence<technique.cost){showToast("Esensi Dao tidak mencukupi.");return;}
-  state.essence-=technique.cost;state.techniques.push(id);addLog("Kitab Dipelajari",`Kamu berhasil mempelajari ${technique.name}.`);
-  showToast(`Teknik baru dikuasai: ${technique.name}`);render();saveState();
-}
-
-function claimMission(id){
-  const mission=MISSIONS.find(item=>item.id===id);if(!mission||state.claimedMissions.includes(id))return;
-  const progress=id==="gather"?state.totalQiGathered:state.missions[id]||0;
-  if(progress<mission.target){showToast("Misi belum selesai.");return;}
-  state.claimedMissions.push(id);state.essence+=mission.reward;addLog("Misi Diselesaikan",`${mission.name} selesai. +${mission.reward} Esensi Dao.`);
-  showToast(`Hadiah diterima! +${mission.reward} Esensi Dao`);render();saveState();
-}
-
-function checkMissionProgress(){
-  MISSIONS.forEach(mission=>{
-    const progress=mission.id==="gather"?state.totalQiGathered:state.missions[mission.id]||0;
-    if(progress>=mission.target&&!state.completedMissions.includes(mission.id)){
-      state.completedMissions.push(mission.id);addLog("Misi Terbuka",`${mission.name} siap diklaim.`);
+  function save(){
+    try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); $("saveStatus").textContent="Tersimpan"; }
+    catch(e){ $("saveStatus").textContent="Sesi aktif"; }
+  }
+  function currentRealm(){return realms[Math.min(state.realm,realms.length-1)];}
+  function requiredQi(){return Math.floor(currentRealm().base * (1 + (state.stage-1)*0.17));}
+  function techniqueBonus(){return state.ownedTechniques.reduce((sum,id)=>sum+(techniques.find(t=>t.id===id)?.gain||0),0);}
+  function meditateGain(){return 7+techniqueBonus();}
+  function chance(){return Math.min(96,Math.max(35,72+Math.floor((state.power-currentRealm().power)*0.12)+(state.inventory.charm>0?5:0)));}
+  function addLog(message){state.logs.unshift({time:new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}),message});state.logs=state.logs.slice(0,35);}
+  function notify(message){const el=$("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600);}
+  function realmLabel(){return `${currentRealm().name}`;}
+  function stageLabel(){const names=["Awal","Menengah","Lanjut","Puncak"];let part=state.stage<=3?"Awal":state.stage<=6?"Menengah":state.stage<=8?"Lanjut":"Puncak";return `Tahap ${state.stage} · ${part}`;}
+  function render(){
+    $("realmName").textContent=realmLabel();$("realmStage").textContent=stageLabel();
+    $("qiStat").textContent=Math.floor(state.qi).toLocaleString("id-ID");$("essenceStat").textContent=state.essence.toLocaleString("id-ID");
+    $("powerStat").textContent=Math.floor(state.power).toLocaleString("id-ID");$("ageStat").textContent=state.age>=999999?"Tak Terukur":state.age.toLocaleString("id-ID");
+    $("playerTitle").textContent=`${state.realm===0?"Qi Seeker":state.realm<4?"Cultivator":state.realm<8?"Immortal Seeker":"Dao Sovereign"} · ${state.sect}`;
+    const req=requiredQi(),pct=Math.min(100,Math.floor(state.qi/req*100));
+    $("qiProgressText").textContent=`${Math.floor(state.qi).toLocaleString("id-ID")} / ${req.toLocaleString("id-ID")} Qi`;$("qiPercent").textContent=`${pct}%`;$("qiProgressBar").style.width=pct+"%";
+    $("meditateGain").textContent=`+${meditateGain()} Qi`;$("breakthroughBtn").disabled=state.qi<req;
+    $("breakthroughHint").textContent=state.qi>=req?"Qi telah mencapai batas. Cobalah melakukan terobosan.":`Butuh ${Math.max(0,req-Math.floor(state.qi)).toLocaleString("id-ID")} Qi lagi untuk mencapai batas ranah.`;
+    $("trialLevel").textContent=`Ujian Ranah ${state.realm+1}`;$("trialChance").textContent=`${chance()}%`;
+    $("trialBtn").disabled=!state.trialAvailable;
+    $("trialHint").textContent=state.trialAvailable?"Energi langit mulai bergejolak. Persiapkan dirimu.":"Terobosan ranah akan membuka kesengsaraan surgawi.";
+    $("sectName").textContent=state.sect;$("sectDesc").textContent=state.sectJoined?"Sekte ini mengakui potensimu. Teruslah berkultivasi demi kehormatan sekte.":"Belum terikat pada satu jalan. Temukan tempatmu di antara para abadi.";
+    $("sectBtn").textContent=state.sectJoined?"Keluar Sekte":"Bergabung";$("sectBtn").classList.toggle("owned",state.sectJoined);
+    renderTechniques();renderInventory();renderMissions();renderLogs();renderEnemy();
+    save();
+  }
+  function renderTechniques(){
+    $("techniqueList").innerHTML=techniques.map(t=>{
+      const owned=state.ownedTechniques.includes(t.id);
+      return `<article class="technique-row"><div class="tech-icon">${t.icon}</div><div class="tech-copy"><strong>${t.name}</strong><p>${t.desc}</p></div><div class="tech-meta"><span>+${t.gain} Qi</span><button class="small-button ${owned?"owned":""}" data-tech="${t.id}" ${owned||state.essence<t.cost?"disabled":""}>${owned?"Dipelajari":t.cost===0?"Aktif":`${t.cost} Essence`}</button></div></article>`;
+    }).join("");
+    $("techniqueList").querySelectorAll("[data-tech]").forEach(btn=>btn.addEventListener("click",()=>learnTechnique(btn.dataset.tech)));
+  }
+  function renderInventory(){
+    const items=[{id:"pill",icon:"🧪",name:"Pil Pengumpul Qi",desc:"Pulihkan 60% Qi yang dibutuhkan",count:state.inventory.pill},{id:"charm",icon:"🔶",name:"Jimat Pelindung Dao",desc:"+5% peluang ujian berikutnya",count:state.inventory.charm},{id:"artifact",icon:"🪬",name:"Fragmen Artefak",desc:"Peninggalan dari pertarungan",count:state.inventory.artifact}];
+    $("inventoryGrid").innerHTML=items.map(i=>`<article class="item-card"><div class="item-art">${i.icon}</div><div class="item-info"><strong>${i.name}</strong><span>${i.desc}</span></div><span class="item-count">×${i.count}</span>${i.id==="pill"?'<button class="small-button" data-use="pill">Gunakan</button>':i.id==="charm"?'<button class="small-button" data-use="charm">Pasang</button>':""}</article>`).join("");
+    $("inventoryGrid").querySelectorAll("[data-use]").forEach(btn=>btn.addEventListener("click",()=>useItem(btn.dataset.use)));
+  }
+  function renderMissions(){
+    $("missionList").innerHTML=missions.map(m=>{
+      const progress=Math.min(m.target,state[m.type]||0),done=progress>=m.target,claimed=state.missionsClaimed.includes(m.id);
+      return `<div class="mission-row ${claimed?"done":""}"><div class="mission-check">${claimed?"✓":done?"✦":"·"}</div><div class="mission-copy"><strong>${m.name}</strong><span>${m.desc} (${progress}/${m.target})</span></div><span class="mission-reward">${claimed?"Selesai":done?`+${m.reward} ✧`:`+${m.reward} Essence`}</span>${done&&!claimed?`<button class="small-button" data-claim="${m.id}">Klaim</button>`:""}</div>`;
+    }).join("");
+    $("missionList").querySelectorAll("[data-claim]").forEach(btn=>btn.addEventListener("click",()=>claimMission(btn.dataset.claim)));
+  }
+  function renderLogs(){
+    $("logList").innerHTML=state.logs.length?state.logs.map(log=>`<div class="log-entry"><time>${log.time}</time><span>${escapeHtml(log.message)}</span></div>`).join(""):'<div class="log-entry"><span>Perjalananmu baru dimulai. Alam semesta menanti langkah pertamamu.</span></div>';
+  }
+  function renderEnemy(){
+    const enemy=enemyTypes[state.enemyIndex%enemyTypes.length];
+    $("enemyName").textContent=enemy.name;$("enemyMeta").textContent=`Kekuatan ${enemy.power+state.realm*3} · Hadiah ${enemy.reward+state.realm*2} Essence`;
+    $("enemyHealthText").textContent=`${state.enemyHp}%`;$("enemyHealthBar").style.width=state.enemyHp+"%";$("enemyHealthBar").style.background=state.enemyHp<30?"#ed6f85":"linear-gradient(90deg,#b35d83,#ef9aab)";
+    $("fightBtn").textContent=state.enemyHp<=0?"✦ Cari Musuh Berikutnya":"⚔  Mulai Pertarungan";
+  }
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function meditate(){
+    const gain=meditateGain();const before=state.qi;state.qi=Math.min(requiredQi(),state.qi+gain);const actual=Math.floor(state.qi-before);
+    state.totalQi+=actual;state.meditations++;state.age+=0.01;
+    addLog(`Meditasi berhasil. Kamu menyerap ${actual} Qi dari arus spiritual.`);
+    render();if(state.qi>=requiredQi())notify("Qi mencapai batas! Kamu siap melakukan terobosan.");
+  }
+  function breakthrough(){
+    if(state.qi<requiredQi())return;
+    const oldRealm=state.realm,oldStage=state.stage;
+    const roll=Math.random();
+    if(roll<0.72){
+      state.qi=0;state.breakthroughs++;state.trialAvailable=true;
+      if(state.stage<9 && state.realm<realms.length-1){state.stage++;state.power+=2+state.realm*2;state.age+=Math.max(1,currentRealm().age*.03);}
+      else if(state.realm<realms.length-1){state.realm++;state.stage=1;state.power=currentRealm().power;state.age=Math.max(state.age,currentRealm().age);state.trialAvailable=true;}
+      addLog(`Terobosan berhasil! ${realms[oldRealm].name} tahap ${oldStage} telah dilampaui.`);
+      notify("Terobosan berhasil! Kesengsaraan surgawi menanti.");
+    }else{
+      state.qi=Math.floor(requiredQi()*.35);state.power=Math.max(1,state.power-1);
+      addLog("Terobosan gagal. Aliran Qi berbalik dan sebagian kekuatan terkikis.");
+      notify("Terobosan gagal. Tenangkan aliran Qi dan coba lagi.");
     }
-  });
-}
-
-function resetGame(){state=createDefaultState();render();saveState();$("confirm-dialog").close();showToast("Perjalanan baru telah dimulai.");}
-function bindEvents(){
-  $("meditate-btn").addEventListener("click",meditate);$("breakthrough-btn").addEventListener("click",breakthrough);$("trial-btn").addEventListener("click",faceTribulation);
-  $("reset-btn").addEventListener("click",()=>$("confirm-dialog").showModal());$("cancel-reset").addEventListener("click",()=>$("confirm-dialog").close());
-  $("confirm-reset").addEventListener("click",resetGame);
-  $("sound-toggle").addEventListener("click",()=>{visualEffectsEnabled=!visualEffectsEnabled;$("sound-toggle").textContent=visualEffectsEnabled?"✧":"◇";showToast(visualEffectsEnabled?"Efek visual diaktifkan.":"Efek visual meditasi dinonaktifkan.");});
-}
-function initializeGame(){
-  if(state.lastDailyReset!==new Date().toDateString()){
-    state.lastDailyReset=new Date().toDateString();state.missions={meditate:0,gather:0,breakthrough:0};state.claimedMissions=[];state.completedMissions=[];
-    addLog("Hari Baru","Takdir baru menanti. Mulailah kultivasimu kembali.");
+    render();
   }
-  checkMissionProgress();bindEvents();render();saveState();
-}
-initializeGame();
+  function faceTrial(){
+    if(!state.trialAvailable)return;
+    const roll=Math.random()*100,success=roll<chance();
+    state.trialAvailable=false;
+    if(success){
+      const reward=15+state.realm*8;state.essence+=reward;state.essenceEarned+=reward;state.power+=5+state.realm*3;
+      state.age+=Math.max(5,state.realm*12);state.inventory.artifact++;
+      addLog(`Kesengsaraan surgawi ditaklukkan! Kamu memperoleh ${reward} Esensi Dao dan satu Fragmen Artefak.`);
+      notify("Petir surgawi telah ditaklukkan!"); 
+    }else{
+      state.qi=Math.floor(state.qi*.5);state.power=Math.max(1,state.power-2);
+      addLog("Petir surgawi menghantam inti kultivasi. Separuh Qi hilang.");
+      notify("Ujian gagal. Pulihkan dirimu sebelum mencoba lagi.");
+    }
+    render();
+  }
+  function learnTechnique(id){
+    const t=techniques.find(x=>x.id===id);if(!t||state.ownedTechniques.includes(id)||state.essence<t.cost)return;
+    state.essence-=t.cost;state.ownedTechniques.push(id);addLog(`Teknik ${t.name} berhasil dipelajari.`);notify(`Teknik baru: ${t.name}`);render();
+  }
+  function useItem(id){
+    if(!state.inventory[id]){notify("Persediaan tidak cukup.");return;}
+    if(id==="pill"){
+      const missing=requiredQi()-state.qi;if(missing<=0){notify("Qi sudah mencapai batas ranah.");return;}
+      const restored=Math.min(missing,Math.ceil(requiredQi()*.6));state.qi+=restored;state.inventory.pill--;
+      addLog(`Pil Pengumpul Qi digunakan. ${restored} Qi dipulihkan.`);notify(`Pulih ${restored} Qi.`);
+    }else if(id==="charm"){
+      if(state.trialAvailable){notify("Jimat aktif saat kesengsaraan berlangsung.");return;}
+      state.inventory.charm--;state.power+=2;addLog("Jimat Pelindung Dao dipakai. Kekuatan meningkat dan peluang ujian diperkuat.");notify("Jimat dipasang: +2 kekuatan.");
+    }
+    render();
+  }
+  function buyItem(id){
+    const price=id==="pill"?12:18;if(state.essence<price){notify("Esensi Dao tidak cukup.");return;}
+    state.essence-=price;state.inventory[id]=(state.inventory[id]||0)+1;addLog(`${id==="pill"?"Pil Pengumpul Qi":"Jimat Pelindung Dao"} dibeli seharga ${price} Esensi Dao.`);notify("Barang berhasil dibeli.");render();
+  }
+  function claimMission(id){
+    const m=missions.find(x=>x.id===id);if(!m||state.missionsClaimed.includes(id)||(state[m.type]||0)<m.target)return;
+    state.missionsClaimed.push(id);state.essence+=m.reward;state.essenceEarned+=m.reward;addLog(`Misi "${m.name}" selesai. ${m.reward} Esensi Dao diterima.`);notify(`Misi selesai: +${m.reward} Essence`);render();
+  }
+  function fight(){
+    if(state.enemyHp<=0){state.enemyIndex++;state.enemyHp=100;renderEnemy();notify("Musuh baru muncul dari kabut.");return;}
+    const enemy=enemyTypes[state.enemyIndex%enemyTypes.length];const enemyPower=enemy.power+state.realm*3;
+    const damage=Math.max(8,Math.floor(state.power*1.4+Math.random()*12));
+    state.enemyHp=Math.max(0,state.enemyHp-damage);
+    let message=`Seranganmu menghasilkan ${damage}% kerusakan pada ${enemy.name}.`;
+    if(state.enemyHp<=0){
+      const reward=enemy.reward+state.realm*2;state.essence+=reward;state.essenceEarned+=reward;state.wins++;state.inventory.artifact++;
+      state.qi=Math.min(requiredQi(),state.qi+Math.floor(requiredQi()*.12));
+      message+=` Musuh tumbang! +${reward} Esensi Dao dan 1 Fragmen Artefak.`;
+      addLog(`Kemenangan melawan ${enemy.name}. Kamu memperoleh ${reward} Esensi Dao.`);
+      notify(`Kemenangan! +${reward} Essence.`);
+    }else{
+      const counter=Math.max(1,Math.floor(enemyPower*0.15));state.qi=Math.max(0,state.qi-counter);
+      message+=` Serangan balasan mengikis ${counter} Qi.`;
+    }
+    $("combatLog").textContent=message;render();
+  }
+  function toggleSect(){
+    if(state.sectJoined){state.sectJoined=false;state.sect="Pengelana Tanpa Sekte";addLog("Kamu meninggalkan sekte dan kembali menapaki jalan sendiri.");notify("Kamu kembali menjadi pengelana.");}
+    else{state.sectJoined=true;state.sect="Paviliun Bintang Abadi";state.essence+=10;state.essenceEarned+=10;addLog("Kamu bergabung dengan Paviliun Bintang Abadi dan menerima 10 Esensi Dao sebagai sambutan.");notify("Selamat datang di Paviliun Bintang Abadi!");}
+    render();
+  }
+  $("meditateBtn").addEventListener("click",meditate);
+  $("breakthroughBtn").addEventListener("click",breakthrough);
+  $("trialBtn").addEventListener("click",faceTrial);
+  $("fightBtn").addEventListener("click",fight);
+  $("sectBtn").addEventListener("click",toggleSect);
+  document.querySelectorAll("[data-buy]").forEach(btn=>btn.addEventListener("click",()=>buyItem(btn.dataset.buy)));
+  $("clearLogBtn").addEventListener("click",()=>{state.logs=[];renderLogs();save();notify("Catatan perjalanan dibersihkan.");});
+  $("resetBtn").addEventListener("click",()=>$("confirmDialog").showModal());
+  $("cancelReset").addEventListener("click",()=>$("confirmDialog").close());
+  $("confirmReset").addEventListener("click",()=>{localStorage.removeItem(SAVE_KEY);state=freshState();$("confirmDialog").close();$("combatLog").textContent="Kabut bergerak. Sesuatu mengintai di kejauhan...";addLog("Perjalanan baru dimulai di bawah langit yang tak berujung.");render();notify("Takdir baru telah dimulai.");});
+  $("soundlessMark").addEventListener("click",()=>notify("Dao tidak bersuara, tetapi selalu menunjukkan jalan."));
+  addLog("Perjalanan kultivasimu dimulai. Semoga Dao menuntun langkahmu.");
+  render();
+})();

@@ -3,123 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080b18">
-  <meta name="description" content="Tempuh jalan Dao, kumpulkan Qi, dan capai puncak keabadian.">
-  <title>Dao of Eternity — Jalan Keabadian</title>
+  <meta name="theme-color" content="#090d1d">
+  <meta name="description" content="Dao of Eternity — simulasi perjalanan kultivator menuju puncak keabadian.">
+  <title>Dao of Eternity — Path Beyond Heaven</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="starfield" aria-hidden="true"></div>
-  <div class="nebula nebula-one" aria-hidden="true"></div>
-  <div class="nebula nebula-two" aria-hidden="true"></div>
-
   <header class="topbar">
-    <a class="brand" href="#" aria-label="Dao of Eternity">
-      <span class="brand-symbol">☯</span>
+    <a class="brand" href="#" aria-label="Dao of Eternity beranda">
+      <span class="brand-mark">☯</span>
       <span><strong>DAO OF ETERNITY</strong><small>THE PATH BEYOND HEAVEN</small></span>
     </a>
-    <div class="top-actions">
-      <span class="save-indicator"><i></i> <span id="save-status">Tersimpan</span></span>
-      <button class="icon-button" id="sound-toggle" aria-label="Toggle efek visual">✧</button>
-    </div>
+    <div class="save-state"><i></i><span id="saveStatus">Tersimpan</span></div>
+    <button class="icon-button" id="soundlessMark" title="Lambang Dao" aria-label="Lambang Dao">✧</button>
   </header>
 
-  <main class="app-shell">
+  <main class="page">
     <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow"><span></span> CHRONICLES OF THE IMMORTAL</div>
-        <h1>Jalan Menuju<br><span>Puncak Keabadian</span></h1>
-        <p>Langit membatasi yang fana. Dao menanti mereka yang berani melampauinya.</p>
-      </div>
-      <div class="hero-seal" aria-label="Simbol Dao">
-        <div class="seal-orbit orbit-a"></div><div class="seal-orbit orbit-b"></div>
-        <div class="seal-core">道</div><span class="seal-star star-a">✦</span><span class="seal-star star-b">✧</span>
+      <div class="eyebrow"><span></span> CHRONICLES OF THE IMMORTAL</div>
+      <div class="hero-row">
+        <div>
+          <h1>Jalan Menuju<br><em>Puncak Keabadian</em></h1>
+          <p class="hero-copy">Langit membatasi yang fana. Dao menanti mereka yang berani melampauinya.</p>
+        </div>
+        <div class="dao-seal" aria-hidden="true"><span>道</span><i></i><b>✦</b></div>
       </div>
     </section>
 
-    <section class="cultivator-bar panel">
+    <section class="cultivator-card panel">
       <div class="avatar">☯</div>
       <div class="cultivator-info">
-        <span class="muted-label">KULTIVATOR</span>
-        <h2 id="player-name">Pengembara Dao</h2>
-        <p id="player-title">Mortal Wanderer</p>
+        <label>KULTIVATOR</label>
+        <h2 id="playerName">Pengembara Dao</h2>
+        <p id="playerTitle">Qi Seeker · Pengelana Tanpa Sekte</p>
       </div>
-      <div class="realm-badge">
-        <span class="realm-symbol">✧</span>
-        <div><span class="muted-label">RANAH SAAT INI</span><strong id="realm-name">Pemurnian Tubuh</strong><small id="realm-stage">Tahap 1 · Awal</small></div>
+      <div class="realm-summary">
+        <label>RANAH SAAT INI</label>
+        <strong id="realmName">Pengumpulan Qi</strong>
+        <span id="realmStage">Tahap 1 · Awal</span>
       </div>
     </section>
 
     <section class="stats-grid">
-      <article class="stat-card panel"><span class="stat-icon qi-icon">✧</span><span class="stat-label">ENERGI SPIRITUAL</span><strong id="qi-value">0</strong><small>Qi Spiritual</small></article>
-      <article class="stat-card panel"><span class="stat-icon gold-icon">◈</span><span class="stat-label">ESENSI DAO</span><strong id="essence-value">0</strong><small>Dao Essence</small></article>
-      <article class="stat-card panel"><span class="stat-icon violet-icon">✦</span><span class="stat-label">KULTIVASI</span><strong id="power-value">1</strong><small>Tingkat kekuatan</small></article>
-      <article class="stat-card panel"><span class="stat-icon blue-icon">⌁</span><span class="stat-label">USIA SPIRITUAL</span><strong id="age-value">18</strong><small>Tahun fana</small></article>
+      <article class="stat-card panel"><div class="stat-top"><label>ENERGI SPIRITUAL</label><span class="stat-symbol blue">✧</span></div><strong id="qiStat">0</strong><small>Qi Spiritual</small></article>
+      <article class="stat-card panel"><div class="stat-top"><label>ESENSI DAO</label><span class="stat-symbol gold">◇</span></div><strong id="essenceStat">20</strong><small>Dao Essence</small></article>
+      <article class="stat-card panel"><div class="stat-top"><label>KULTIVASI</label><span class="stat-symbol violet">✦</span></div><strong id="powerStat">3</strong><small>Tingkat kekuatan</small></article>
+      <article class="stat-card panel"><div class="stat-top"><label>USIA SPIRITUAL</label><span class="stat-symbol mint">⌁</span></div><strong id="ageStat">31</strong><small>Tahun fana</small></article>
     </section>
 
-    <section class="game-grid">
-      <div class="main-column">
-        <article class="panel cultivation-panel">
-          <div class="section-heading"><div><span class="eyebrow">INNER WORLD</span><h2>Inti Kultivasi</h2></div><span class="live-tag"><i></i> AKTIF</span></div>
-          <div class="meditation-scene">
-            <div class="scene-grid"></div><div class="scene-orbit scene-orbit-one"></div><div class="scene-orbit scene-orbit-two"></div>
-            <div class="scene-moon"></div><div class="meditation-aura"></div><div class="meditator">道</div>
-            <div class="scene-stars">✦　·　✧　　·　✦</div><p class="scene-caption" id="scene-caption">Dengarkan napas alam semesta...</p>
-          </div>
-          <div class="progress-heading"><div><span class="muted-label">KEMAJUAN RANAH</span><strong id="progress-text">0 / 100 Qi</strong></div><span class="progress-percent" id="progress-percent">0%</span></div>
-          <div class="progress-track"><div class="progress-fill" id="qi-progress"></div></div>
-          <div class="action-row">
-            <button class="primary-button" id="meditate-btn"><span>✧</span> Bermeditasi <small id="meditate-gain">+10 Qi</small></button>
-            <button class="secondary-button" id="breakthrough-btn">Terobosan <span>↗</span></button>
-          </div>
-          <p class="hint" id="cultivation-hint">Kumpulkan Qi hingga penuh untuk mencoba terobosan.</p>
-        </article>
-
-        <article class="panel tribulation-panel">
-          <div class="section-heading"><div><span class="eyebrow">HEAVEN'S TRIAL</span><h2>Kesengsaraan Surgawi</h2></div><span class="trial-symbol">⚡</span></div>
-          <p class="description">Langit menguji mereka yang ingin melampaui takdir. Persiapkan Qi sebelum menghadapi petir surgawi.</p>
-          <div class="trial-info"><div><span class="muted-label">TINGKAT UJIAN</span><strong id="trial-level">Ujian Fana</strong></div><div><span class="muted-label">PELUANG BERHASIL</span><strong id="trial-chance">70%</strong></div></div>
-          <button class="trial-button" id="trial-btn">⚡ Hadapi Kesengsaraan</button>
-          <p class="hint" id="trial-hint">Biaya ujian: 30 Qi. Keberhasilan meningkatkan kekuatanmu.</p>
-        </article>
-
-        <article class="panel techniques-panel">
-          <div class="section-heading"><div><span class="eyebrow">ANCIENT KNOWLEDGE</span><h2>Kitab Teknik</h2></div><span class="muted-label">RAHASIA DAO</span></div>
-          <div id="techniques-list" class="techniques-list"></div>
-        </article>
+    <section class="panel section-card inner-world">
+      <div class="section-heading"><div><label>INNER WORLD</label><h2>Inti Kultivasi</h2></div><span class="live"><i></i> AKTIF</span></div>
+      <div class="cosmos-stage">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
+        <span class="orbit-star star-a">✦</span><span class="orbit-star star-b">✧</span><span class="orbit-star star-c">✦</span>
+        <div class="core">道</div>
+        <p>Dengarkan napas alam semesta...</p>
       </div>
-
-      <aside class="side-column">
-        <article class="panel missions-panel">
-          <div class="section-heading"><div><span class="eyebrow">DAILY DESTINY</span><h2>Misi Kultivasi</h2></div><span class="mission-count" id="mission-count">0/3</span></div>
-          <p class="description">Setiap tindakan adalah satu langkah menuju Dao.</p>
-          <div id="missions-list" class="missions-list"></div>
-          <div class="mission-footer"><span class="muted-label">HADIAH TAMAT</span><strong>✦ +50 Esensi Dao</strong></div>
-        </article>
-
-        <article class="panel records-panel">
-          <div class="section-heading"><div><span class="eyebrow">IMMORTAL RECORDS</span><h2>Catatan Dao</h2></div><span class="record-symbol">📜</span></div>
-          <div id="log-list" class="log-list" aria-live="polite"></div>
-        </article>
-
-        <article class="panel destiny-panel">
-          <span class="eyebrow">YOUR DESTINY</span><h2>Takdir Tidak Tertulis</h2>
-          <p id="destiny-text">Jalan seribu li dimulai dengan satu langkah. Kumpulkan Qi, dan bukalah gerbang takdirmu.</p>
-          <div class="destiny-divider">✧ ─── ☯ ─── ✧</div>
-          <button class="text-button" id="reset-btn">Mulai Perjalanan Baru ↗</button>
-        </article>
-      </aside>
+      <div class="progress-heading"><label>KEMAJUAN RANAH</label><strong><span id="qiProgressText">0 / 180 Qi</span><span id="qiPercent">0%</span></strong></div>
+      <div class="progress-track"><div id="qiProgressBar" class="progress-fill"></div></div>
+      <div class="action-stack">
+        <button class="primary-button" id="meditateBtn">✧ &nbsp; Bermeditasi <span id="meditateGain">+11 Qi</span></button>
+        <button class="secondary-button" id="breakthroughBtn" disabled>Terobosan ↗</button>
+      </div>
+      <p class="helper" id="breakthroughHint">Kumpulkan Qi untuk mencapai batas ranah.</p>
+      <div class="inline-notice hidden" id="cultivationNotice" role="status"></div>
     </section>
 
-    <footer class="footer"><div class="footer-symbol">道</div><p>“Langit memiliki Dao, bumi memiliki jalannya, dan aku memiliki tekadku sendiri.”</p><span>DAO OF ETERNITY · A JOURNEY BEYOND TIME</span></footer>
+    <section class="panel section-card tribulation">
+      <div class="section-heading"><div><label>HEAVEN'S TRIAL</label><h2>Kesengsaraan Surgawi</h2></div><span class="lightning">ϟ</span></div>
+      <p class="section-copy">Langit menguji mereka yang ingin melampaui takdir. Persiapkan Qi sebelum menghadapi petir surgawi.</p>
+      <div class="trial-info">
+        <div><label>TINGKAT UJIAN</label><strong id="trialLevel">Ujian Ranah 1</strong></div>
+        <div><label>PELUANG BERHASIL</label><strong id="trialChance">72%</strong></div>
+      </div>
+      <button class="secondary-button full" id="trialBtn" disabled>ϟ &nbsp; Hadapi Kesengsaraan</button>
+      <p class="helper" id="trialHint">Terobosan membuka ujian yang lebih tinggi.</p>
+    </section>
+
+    <section class="panel section-card">
+      <div class="section-heading"><div><label>DAO ARTS</label><h2>Teknik Kultivasi</h2></div><span class="section-icon">✧</span></div>
+      <p class="section-copy">Pelajari seni kuno untuk memperkuat aliran Qi dan menaklukkan batas diri.</p>
+      <div class="technique-list" id="techniqueList"></div>
+    </section>
+
+    <section class="panel section-card">
+      <div class="section-heading"><div><label>SPIRITUAL TREASURY</label><h2>Artefak & Pil</h2></div><span class="section-icon">◇</span></div>
+      <p class="section-copy">Gunakan harta spiritual pada saat yang tepat. Persediaan dapat dibeli dengan Esensi Dao.</p>
+      <div class="inventory-grid" id="inventoryGrid"></div>
+      <div class="shop-row">
+        <button class="shop-button" data-buy="pill">Beli Pil Qi <span>12 Essence</span></button>
+        <button class="shop-button" data-buy="charm">Beli Jimat Dao <span>18 Essence</span></button>
+      </div>
+    </section>
+
+    <section class="panel section-card battle">
+      <div class="section-heading"><div><label>REALM ENCOUNTER</label><h2>Uji Kekuatan</h2></div><span class="lightning violet-text">⚔</span></div>
+      <p class="section-copy">Makhluk spiritual muncul di tepi dunia fana. Kalahkan mereka untuk memperoleh Esensi Dao dan pengalaman.</p>
+      <div class="enemy-card">
+        <div class="enemy-art">☄</div>
+        <div class="enemy-info"><label>MUSUH DI HADAPAN</label><strong id="enemyName">Serigala Kabut</strong><span id="enemyMeta">Kekuatan 4 · Hadiah 8 Essence</span></div>
+        <div class="enemy-health"><span id="enemyHealthText">100%</span><div class="health-track"><div id="enemyHealthBar"></div></div></div>
+      </div>
+      <button class="primary-button full" id="fightBtn">⚔ &nbsp; Mulai Pertarungan</button>
+      <div class="combat-log" id="combatLog">Kabut bergerak. Sesuatu mengintai di kejauhan...</div>
+    </section>
+
+    <section class="panel section-card sect">
+      <div class="section-heading"><div><label>IMMORTAL ALLIANCE</label><h2>Sekte & Misi</h2></div><span class="section-icon">☯</span></div>
+      <div class="sect-card">
+        <div class="sect-emblem">☯</div><div class="sect-copy"><label>SEKTE SAAT INI</label><strong id="sectName">Pengelana Tanpa Sekte</strong><p id="sectDesc">Belum terikat pada satu jalan. Temukan tempatmu di antara para abadi.</p></div>
+        <button id="sectBtn" class="small-button">Bergabung</button>
+      </div>
+      <div class="mission-list" id="missionList"></div>
+    </section>
+
+    <section class="panel section-card">
+      <div class="section-heading"><div><label>CHRONICLES</label><h2>Catatan Perjalanan</h2></div><button class="text-button" id="clearLogBtn">Bersihkan</button></div>
+      <div class="log-list" id="logList" aria-live="polite"></div>
+    </section>
+
+    <footer class="footer">
+      <span>☯ DAO OF ETERNITY</span>
+      <span>Setiap bintang menyimpan sebuah Dao.</span>
+      <button id="resetBtn" class="reset-button">Mulai Perjalanan Baru</button>
+    </footer>
   </main>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <dialog id="confirm-dialog" class="confirm-dialog">
-    <div class="dialog-symbol">☯</div><h2>Memulai Takdir Baru?</h2>
-    <p>Seluruh progres kultivasi saat ini akan dihapus. Keputusan ini tidak dapat dibatalkan.</p>
-    <div class="dialog-actions"><button class="secondary-button" id="cancel-reset">Tetap di Sini</button><button class="danger-button" id="confirm-reset">Mulai Ulang</button></div>
+  <dialog id="confirmDialog" class="confirm-dialog">
+    <div class="dialog-mark">☯</div><h2>Mulai perjalanan baru?</h2>
+    <p>Seluruh progres kultivasi pada perangkat ini akan dihapus. Takdir lama tak dapat dipanggil kembali.</p>
+    <div class="dialog-actions"><button id="cancelReset" class="secondary-button">Kembali</button><button id="confirmReset" class="danger-button">Reset Perjalanan</button></div>
   </dialog>
+  <div id="toast" class="toast" role="status"></div>
   <script src="script.js"></script>
 </body>
 </html>
