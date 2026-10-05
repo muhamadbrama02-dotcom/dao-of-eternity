@@ -57,11 +57,61 @@
 
     <section class="panel section-card inner-world">
       <div class="section-heading"><div><label>INNER WORLD</label><h2>Inti Kultivasi</h2></div><span class="live"><i></i> AKTIF</span></div>
-      <div class="cosmos-stage">
+      <div class="cosmos-stage meditation-scene" id="meditationScene">
+        <div class="nebula nebula-one"></div><div class="nebula nebula-two"></div>
+        <div class="scene-grid"></div>
         <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
         <span class="orbit-star star-a">✦</span><span class="orbit-star star-b">✧</span><span class="orbit-star star-c">✦</span>
-        <div class="core">道</div>
-        <p>Dengarkan napas alam semesta...</p>
+        <span class="orbit-star star-d">✧</span><span class="orbit-star star-e">✦</span>
+        <div class="aura-halo aura-halo-back"></div>
+        <div class="aura-halo aura-halo-front"></div>
+        <div class="cultivator-figure" aria-label="Kultivator sedang bermeditasi">
+          <div class="figure-aura"></div>
+          <svg class="cultivator-svg" viewBox="0 0 220 250" role="img" aria-label="Siluet kultivator duduk bersila memancarkan aura spiritual">
+            <defs>
+              <linearGradient id="robeGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f0d99b"/>
+                <stop offset="45%" stop-color="#a88bdc"/>
+                <stop offset="100%" stop-color="#5269b5"/>
+              </linearGradient>
+              <linearGradient id="robeShade" x1="0" y1="0" x2="0.8" y2="1">
+                <stop offset="0%" stop-color="#29345f"/>
+                <stop offset="100%" stop-color="#111a37"/>
+              </linearGradient>
+              <radialGradient id="headGlow">
+                <stop offset="0%" stop-color="#fff1c7"/>
+                <stop offset="100%" stop-color="#d4b775"/>
+              </radialGradient>
+            </defs>
+            <!-- flowing hair -->
+            <path d="M91 53 Q73 35 83 18 Q91 30 105 27 Q122 25 131 12 Q142 32 132 54 L126 78 L92 78Z" fill="#11172e" stroke="#8d83b9" stroke-width="1.5"/>
+            <path d="M94 44 Q110 28 128 43 L132 75 L91 75Z" fill="#19213f"/>
+            <!-- head and neck -->
+            <ellipse cx="110" cy="57" rx="20" ry="25" fill="url(#headGlow)" stroke="#f4dfab" stroke-width="1.2"/>
+            <path d="M95 54 Q110 43 125 54" fill="none" stroke="#b89c69" stroke-width="1.4" opacity=".7"/>
+            <path d="M100 65 Q110 71 120 65" fill="none" stroke="#a68b60" stroke-width="1.2" opacity=".7"/>
+            <path d="M100 78 L120 78 L124 95 L96 95Z" fill="#d8c18c"/>
+            <!-- shoulders, sleeves, torso -->
+            <path d="M96 86 Q79 89 65 108 L45 137 Q40 145 49 151 L69 160 L86 129 L85 166 L135 166 L134 128 L151 160 L173 151 Q181 145 175 136 L155 107 Q141 89 124 86Z" fill="url(#robeGradient)" stroke="#d7c5ff" stroke-width="1.3"/>
+            <path d="M95 88 L110 105 L125 88 L137 126 L127 168 L93 168 L83 126Z" fill="url(#robeShade)" stroke="#a99ad6" stroke-width="1.2"/>
+            <path d="M110 105 L110 163 M94 117 L104 132 M126 117 L116 132" fill="none" stroke="#e5d09a" stroke-width="1.5" opacity=".85"/>
+            <!-- hands resting in meditation mudra -->
+            <path d="M78 151 Q91 142 102 153 Q110 160 119 153 Q131 143 143 152 L135 164 Q125 173 110 169 Q95 173 85 164Z" fill="#e8d4a0" stroke="#b8a071" stroke-width="1.2"/>
+            <circle cx="110" cy="157" r="5" fill="#fff0bd"/>
+            <!-- crossed legs and robe folds -->
+            <path d="M88 163 Q69 168 52 184 Q42 194 54 202 Q72 214 104 203 L110 190 L116 203 Q148 214 166 202 Q178 194 168 184 Q151 168 132 163Z" fill="url(#robeGradient)" stroke="#d4c1f2" stroke-width="1.4"/>
+            <path d="M56 194 Q83 183 110 197 Q137 183 164 194 Q146 211 110 211 Q74 211 56 194Z" fill="#1a2446" stroke="#d9c58f" stroke-width="1.2"/>
+            <path d="M72 188 Q90 194 99 204 M148 188 Q130 194 121 204" fill="none" stroke="#d6c2f3" stroke-width="1.5"/>
+            <!-- waist talisman -->
+            <circle cx="110" cy="178" r="7" fill="#f0d99b" stroke="#fff0bd" stroke-width="1"/>
+            <path d="M110 173 L110 183 M105 178 L115 178" stroke="#5b5288" stroke-width="1.3"/>
+          </svg>
+          <div class="figure-sigil">道</div>
+        </div>
+        <div class="qi-stream stream-one"></div><div class="qi-stream stream-two"></div><div class="qi-stream stream-three"></div>
+        <div class="meditation-particles" id="meditationParticles" aria-hidden="true"></div>
+        <div class="scene-caption"><span class="breath-dot"></span><span id="meditationCaption">Menyelaraskan napas dengan Dao...</span></div>
+        <p class="scene-accessible">Kultivator sedang bermeditasi dan menyerap Qi kosmik</p>
       </div>
       <div class="progress-heading"><label>KEMAJUAN RANAH</label><strong><span id="qiProgressText">0 / 180 Qi</span><span id="qiPercent">0%</span></strong></div>
       <div class="progress-track"><div id="qiProgressBar" class="progress-fill"></div></div>

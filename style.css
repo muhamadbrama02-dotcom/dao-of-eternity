@@ -243,3 +243,90 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   .footer { justify-content: space-between; text-align: left; }
   .footer span:nth-child(2) { width: auto; order: initial; }
 }
+
+
+/* === V3: animated cultivator, spiritual aura, and responsive visual effects === */
+.meditation-scene {
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 56%, #354577 0%, #19264a 32%, #0b1228 70%);
+  animation: sceneBreath 6s ease-in-out infinite;
+}
+.meditation-scene::before { opacity: .5; }
+.scene-grid {
+  position: absolute; inset: 48% -20% -35%;
+  background: linear-gradient(rgba(142,162,222,.09) 1px, transparent 1px), linear-gradient(90deg,rgba(142,162,222,.08) 1px,transparent 1px);
+  background-size: 27px 27px;
+  transform: perspective(180px) rotateX(56deg);
+  transform-origin: top center;
+  mask-image: linear-gradient(to bottom, transparent, black 25%, transparent 95%);
+  opacity: .55;
+}
+.nebula { position:absolute; width:190px; height:190px; border-radius:50%; filter:blur(28px); opacity:.18; pointer-events:none; }
+.nebula-one { left:4%; top:5%; background:#7b8fff; animation: nebulaDrift 13s ease-in-out infinite alternate; }
+.nebula-two { right:0%; bottom:0%; background:#d2a9ff; animation: nebulaDrift 17s ease-in-out infinite alternate-reverse; }
+.meditation-scene .orbit { z-index:1; opacity:.8; animation: orbitSpin 20s linear infinite; }
+.meditation-scene .orbit-two { animation-duration:27s; animation-direction:reverse; }
+.meditation-scene .orbit-three { animation-duration:33s; }
+.meditation-scene .orbit-star { z-index:4; animation: starTwinkle 2.8s ease-in-out infinite; }
+.star-b { animation-delay:.7s !important; }
+.star-c { animation-delay:1.3s !important; }
+.star-d { position:absolute; left:18%; bottom:29%; animation-delay:1.8s !important; }
+.star-e { position:absolute; right:18%; top:37%; animation-delay:2.1s !important; }
+.aura-halo { position:absolute; z-index:2; width:115px; height:115px; left:50%; top:45%; border:1px solid #e8d39a66; border-radius:50%; transform:translate(-50%,-50%); box-shadow:0 0 25px #9bb6ff24,inset 0 0 25px #9bb6ff18; }
+.aura-halo-back { animation: auraExpand 4.5s ease-out infinite; }
+.aura-halo-front { width:90px; height:90px; border-color:#b8a3ff70; animation: auraExpand 4.5s ease-out 2.25s infinite; }
+.cultivator-figure { position:absolute; z-index:3; width:clamp(140px, 38vw, 185px); height:205px; left:50%; top:43%; transform:translate(-50%,-50%); animation: cultivatorFloat 4.8s ease-in-out infinite; }
+.cultivator-svg { position:absolute; width:100%; height:100%; inset:0; overflow:visible; filter:drop-shadow(0 0 10px #9bb6ff3d); }
+.figure-aura { position:absolute; width:120px; height:150px; left:50%; top:43%; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(ellipse,#e9d7a52b 0%,#9f9dff22 35%,transparent 72%); filter:blur(5px); animation: auraPulse 3.6s ease-in-out infinite; }
+.figure-sigil { position:absolute; z-index:4; left:50%; top:39%; transform:translate(-50%,-50%); color:#fff0bd; font:24px Georgia,serif; text-shadow:0 0 9px #f5dfa8,0 0 20px #9caeff; animation: sigilGlow 3s ease-in-out infinite; }
+.qi-stream { position:absolute; z-index:2; left:50%; top:47%; width:160px; height:52px; border:1px solid #c3d6ff66; border-radius:50%; transform:translate(-50%,-50%) rotate(-25deg); opacity:0; filter:drop-shadow(0 0 6px #9db8ff); }
+.stream-one { animation: qiOrbit 5.8s linear infinite; }
+.stream-two { width:185px; height:68px; border-color:#e8d39a77; transform:translate(-50%,-50%) rotate(40deg); animation: qiOrbit 7.3s linear infinite reverse; }
+.stream-three { width:130px; height:95px; border-color:#c4a8ff66; transform:translate(-50%,-50%) rotate(72deg); animation: qiOrbit 6.5s linear infinite; }
+.scene-caption { position:absolute; z-index:6; bottom:13px; left:10px; right:10px; display:flex; justify-content:center; align-items:center; gap:8px; color:#c4cdea; font-size:11px; text-align:center; letter-spacing:.3px; text-shadow:0 1px 8px #080d20; }
+.breath-dot { width:6px; height:6px; flex:none; border-radius:50%; background:var(--mint); box-shadow:0 0 10px var(--mint); animation: dotBreath 3.6s ease-in-out infinite; }
+.scene-accessible { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+.meditation-particles { position:absolute; z-index:5; inset:0; overflow:hidden; pointer-events:none; }
+.qi-particle { position:absolute; bottom:25%; left:var(--x); color:var(--particle-color,#e7ca83); font-size:var(--size,12px); opacity:0; text-shadow:0 0 10px currentColor; animation: particleRise var(--duration,3s) ease-out forwards; }
+.meditation-scene.meditating-burst .figure-aura { animation: burstAura .9s ease-out; }
+.meditation-scene.meditating-burst .cultivator-svg { filter:drop-shadow(0 0 18px #f6df9b) drop-shadow(0 0 30px #9bb6ff); }
+.meditation-scene.meditating-burst .aura-halo { animation: burstHalo 1s ease-out; }
+.meditation-scene.meditating-burst .qi-stream { opacity:.9; }
+.meditation-scene.breakthrough-burst { animation: breakthroughFlash 1.1s ease-out; }
+.meditation-scene.trial-burst { animation: lightningFlash .75s ease-out; }
+.stat-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.stat-card.changed { transform:translateY(-3px); border-color:#e7ca8377; box-shadow:0 0 24px #e7ca8318; }
+.primary-button:not(:disabled) { transition:transform .18s ease, box-shadow .18s ease, filter .18s ease; }
+.primary-button:not(:disabled):active { transform:scale(.985); filter:brightness(1.08); }
+.panel { animation: panelArrive .65s both; }
+.stats-grid .stat-card:nth-child(2) { animation-delay:.06s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay:.12s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay:.18s; }
+.enemy-art { animation: enemyHover 3.5s ease-in-out infinite; }
+.health-track div { transition:width .45s cubic-bezier(.2,.7,.2,1); }
+@keyframes sceneBreath { 0%,100% { box-shadow:inset 0 0 35px #6f87d30a; } 50% { box-shadow:inset 0 0 65px #a9baff20; } }
+@keyframes orbitSpin { from { rotate:0deg; } to { rotate:360deg; } }
+@keyframes starTwinkle { 0%,100% { opacity:.45; transform:scale(.8); } 50% { opacity:1; transform:scale(1.25); } }
+@keyframes auraExpand { 0% { opacity:.55; transform:translate(-50%,-50%) scale(.72); } 75% { opacity:.08; transform:translate(-50%,-50%) scale(1.8); } 100% { opacity:0; transform:translate(-50%,-50%) scale(1.9); } }
+@keyframes cultivatorFloat { 0%,100% { margin-top:4px; } 50% { margin-top:-5px; } }
+@keyframes auraPulse { 0%,100% { opacity:.55; transform:translate(-50%,-50%) scale(.9); } 50% { opacity:1; transform:translate(-50%,-50%) scale(1.16); } }
+@keyframes sigilGlow { 0%,100% { opacity:.65; filter:brightness(.9); } 50% { opacity:1; filter:brightness(1.5); } }
+@keyframes qiOrbit { 0% { opacity:0; transform:translate(-50%,-50%) rotate(0deg) scale(.78); } 18% { opacity:.85; } 80% { opacity:.55; } 100% { opacity:0; transform:translate(-50%,-50%) rotate(360deg) scale(1.08); } }
+@keyframes particleRise { 0% { opacity:0; transform:translate(0,0) scale(.6) rotate(0); } 12% { opacity:.95; } 100% { opacity:0; transform:translate(var(--drift,20px),-190px) scale(1.35) rotate(140deg); } }
+@keyframes burstAura { 0% { opacity:.6; transform:translate(-50%,-50%) scale(.8); } 40% { opacity:1; transform:translate(-50%,-50%) scale(1.65); } 100% { opacity:.65; transform:translate(-50%,-50%) scale(1); } }
+@keyframes burstHalo { 0% { opacity:.9; transform:translate(-50%,-50%) scale(.6); } 100% { opacity:0; transform:translate(-50%,-50%) scale(2.3); } }
+@keyframes breakthroughFlash { 0%,100% { filter:brightness(1); } 20% { filter:brightness(1.9) saturate(1.4); } 55% { filter:brightness(1.25); } }
+@keyframes lightningFlash { 0%,100% { filter:brightness(1); } 15% { filter:brightness(2.4) hue-rotate(20deg); } 28% { filter:brightness(.9); } 42% { filter:brightness(1.8); } }
+@keyframes nebulaDrift { from { transform:translate(-8px,-5px) scale(.9); } to { transform:translate(20px,12px) scale(1.15); } }
+@keyframes dotBreath { 0%,100% { transform:scale(.8); opacity:.55; } 50% { transform:scale(1.4); opacity:1; } }
+@keyframes enemyHover { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+@keyframes panelArrive { from { opacity:.82; } to { opacity:1; } }
+@media (min-width:560px) {
+  .cultivator-figure { width:185px; height:220px; top:43%; }
+  .aura-halo { width:140px; height:140px; }
+  .aura-halo-front { width:110px; height:110px; }
+  .scene-caption { font-size:12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; }
+}

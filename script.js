@@ -110,15 +110,55 @@
     $("fightBtn").textContent=state.enemyHp<=0?"✦ Cari Musuh Berikutnya":"⚔  Mulai Pertarungan";
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function spawnQiParticles(count=18, burst=false){
+    const layer=$("meditationParticles");if(!layer)return;
+    const glyphs=["✦","✧","·","✺","◇"];
+    const colors=["#f1dda7","#a9c6ff","#c9b4ff","#8ee2d0"];
+    for(let i=0;i<count;i++){
+      const p=document.createElement("span");
+      p.className="qi-particle";
+      p.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+      p.style.setProperty("--x",`${12+Math.random()*76}%`);
+      p.style.setProperty("--size",`${8+Math.random()*12}px`);
+      p.style.setProperty("--duration",`${2.1+Math.random()*2.2}s`);
+      p.style.setProperty("--drift",`${Math.round((Math.random()-.5)*110)}px`);
+      p.style.setProperty("--particle-color",colors[Math.floor(Math.random()*colors.length)]);
+      p.style.bottom=`${15+Math.random()*18}%`;
+      layer.appendChild(p);
+      p.addEventListener("animationend",()=>p.remove(),{once:true});
+    }
+    if(burst && layer.children.length>70){
+      while(layer.children.length>70) layer.firstElementChild.remove();
+    }
+  }
+  function sceneEffect(className, duration=1100){
+    const scene=$("meditationScene");if(!scene)return;
+    scene.classList.remove("meditating-burst","breakthrough-burst","trial-burst");
+    void scene.offsetWidth;
+    scene.classList.add(className);
+    window.setTimeout(()=>scene.classList.remove(className),duration);
+  }
+  function pulseStats(){
+    ["qiStat","essenceStat","powerStat"].forEach(id=>{
+      const el=$(id);if(!el)return;
+      const card=el.closest(".stat-card");if(!card)return;
+      card.classList.remove("changed");void card.offsetWidth;card.classList.add("changed");
+      window.setTimeout(()=>card.classList.remove("changed"),650);
+    });
+  }
   function meditate(){
     const gain=meditateGain();const before=state.qi;state.qi=Math.min(requiredQi(),state.qi+gain);const actual=Math.floor(state.qi-before);
     state.totalQi+=actual;state.meditations++;state.age+=0.01;
     addLog(`Meditasi berhasil. Kamu menyerap ${actual} Qi dari arus spiritual.`);
+    sceneEffect("meditating-burst",950);spawnQiParticles(20,true);pulseStats();
+    const caption=$("meditationCaption");
+    if(caption){caption.textContent=["Qi mengalir melalui meridian...","Aura Dao semakin kuat...","Bintang-bintang menjawab panggilanmu..."][state.meditations%3];}
     render();if(state.qi>=requiredQi())notify("Qi mencapai batas! Kamu siap melakukan terobosan.");
   }
   function breakthrough(){
     if(state.qi<requiredQi())return;
     const oldRealm=state.realm,oldStage=state.stage;
+    sceneEffect("breakthrough-burst",1150);spawnQiParticles(34,true);
     const roll=Math.random();
     if(roll<0.72){
       state.qi=0;state.breakthroughs++;state.trialAvailable=true;
@@ -136,6 +176,7 @@
   function faceTrial(){
     if(!state.trialAvailable)return;
     const roll=Math.random()*100,success=roll<chance();
+    sceneEffect("trial-burst",800);spawnQiParticles(24,true);
     state.trialAvailable=false;
     if(success){
       const reward=15+state.realm*8;state.essence+=reward;state.essenceEarned+=reward;state.power+=5+state.realm*3;
@@ -177,6 +218,7 @@
     if(state.enemyHp<=0){state.enemyIndex++;state.enemyHp=100;renderEnemy();notify("Musuh baru muncul dari kabut.");return;}
     const enemy=enemyTypes[state.enemyIndex%enemyTypes.length];const enemyPower=enemy.power+state.realm*3;
     const damage=Math.max(8,Math.floor(state.power*1.4+Math.random()*12));
+    sceneEffect("breakthrough-burst",650);spawnQiParticles(12,true);
     state.enemyHp=Math.max(0,state.enemyHp-damage);
     let message=`Seranganmu menghasilkan ${damage}% kerusakan pada ${enemy.name}.`;
     if(state.enemyHp<=0){
@@ -209,4 +251,9 @@
   $("soundlessMark").addEventListener("click",()=>notify("Dao tidak bersuara, tetapi selalu menunjukkan jalan."));
   addLog("Perjalanan kultivasimu dimulai. Semoga Dao menuntun langkahmu.");
   render();
+  window.setTimeout(()=>spawnQiParticles(10),450);
+  window.setInterval(()=>{
+    if(document.hidden)return;
+    spawnQiParticles(2);
+  },1700);
 })();
