@@ -382,3 +382,33 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 
 /* Mobile tap reliability for developer panel */
 .developer-toggle { position:relative; z-index:5; pointer-events:auto; touch-action:manipulation; cursor:pointer; }
+
+
+/* V3.3: flowing hair and robes, realm-tuned aura, breakthrough transformation */
+.meditation-scene { --realm-aura:#8edfff; --realm-robe:#78bfe0; }
+.meditation-scene .figure-aura {
+  background:radial-gradient(ellipse, color-mix(in srgb, var(--realm-aura) 32%, transparent) 0%, color-mix(in srgb, var(--realm-robe) 18%, transparent) 38%, transparent 73%);
+  filter:blur(6px) drop-shadow(0 0 12px var(--realm-aura));
+  transition:background .65s ease, filter .65s ease;
+}
+.meditation-scene .aura-halo { border-color:color-mix(in srgb, var(--realm-aura) 55%, transparent); box-shadow:0 0 28px color-mix(in srgb, var(--realm-aura) 25%, transparent), inset 0 0 22px color-mix(in srgb, var(--realm-aura) 16%, transparent); transition:border-color .65s ease, box-shadow .65s ease; }
+.meditation-scene .aura-halo-front { border-color:color-mix(in srgb, var(--realm-robe) 65%, transparent); }
+.meditation-scene .figure-sigil { color:var(--realm-aura); text-shadow:0 0 10px var(--realm-aura),0 0 24px var(--realm-robe); transition:color .65s ease,text-shadow .65s ease; }
+.meditation-scene .qi-stream { border-color:color-mix(in srgb, var(--realm-aura) 55%, transparent); filter:drop-shadow(0 0 7px var(--realm-aura)); transition:border-color .65s ease,filter .65s ease; }
+.meditation-scene .robe-flow { transform-box:fill-box; transform-origin:center top; animation:robeSway 4.1s ease-in-out infinite; }
+.meditation-scene .robe-legs { animation-delay:-1.6s; transform-origin:center center; }
+.meditation-scene .hair-flow { transform-box:fill-box; transform-origin:top center; animation:hairSway 3.6s ease-in-out infinite; }
+.meditation-scene .hair-front { animation-delay:-1.2s; }
+.meditation-scene.breakthrough-transformation .cultivator-figure { animation:ascensionRise 1.55s cubic-bezier(.2,.7,.2,1); }
+.meditation-scene.breakthrough-transformation .cultivator-svg { filter:drop-shadow(0 0 14px var(--realm-aura)) drop-shadow(0 0 30px var(--realm-robe)); animation:robeRadiance 1.8s ease-out; }
+.meditation-scene.breakthrough-transformation .figure-aura { animation:transcendAura 1.7s ease-out; }
+.meditation-scene.breakthrough-transformation .figure-sigil { animation:transcendSigil 1.7s ease-out; }
+.meditation-scene.breakthrough-transformation .aura-halo { animation:transcendHalo 1.5s ease-out; }
+@keyframes robeSway { 0%,100% { translate:0 0; rotate:0deg; } 35% { translate:-1px 0; rotate:-.65deg; } 70% { translate:1px 1px; rotate:.7deg; } }
+@keyframes hairSway { 0%,100% { translate:0 0; rotate:0deg; } 50% { translate:2px 0; rotate:2deg; } }
+@keyframes ascensionRise { 0% { transform:translate(-50%,-50%) scale(1); filter:brightness(1); } 30% { transform:translate(-50%,-57%) scale(1.08); filter:brightness(1.8); } 62% { transform:translate(-50%,-48%) scale(1.12); filter:brightness(1.35); } 100% { transform:translate(-50%,-50%) scale(1); filter:brightness(1); } }
+@keyframes robeRadiance { 0%,100% { filter:drop-shadow(0 0 8px var(--realm-aura)); } 35% { filter:drop-shadow(0 0 22px var(--realm-aura)) drop-shadow(0 0 38px var(--realm-robe)); } 70% { filter:drop-shadow(0 0 14px var(--realm-aura)); } }
+@keyframes transcendAura { 0% { opacity:.65; transform:translate(-50%,-50%) scale(.75); } 42% { opacity:1; transform:translate(-50%,-50%) scale(1.75); } 100% { opacity:.7; transform:translate(-50%,-50%) scale(1); } }
+@keyframes transcendSigil { 0%,100% { transform:translate(-50%,-50%) scale(1); } 35% { transform:translate(-50%,-50%) scale(1.55) rotate(45deg); filter:brightness(2.2); } 70% { transform:translate(-50%,-50%) scale(1.15) rotate(0deg); } }
+@keyframes transcendHalo { 0% { opacity:.9; transform:translate(-50%,-50%) scale(.65); } 100% { opacity:0; transform:translate(-50%,-50%) scale(2.5); } }
+@media (prefers-reduced-motion: reduce) { .meditation-scene .robe-flow,.meditation-scene .hair-flow { animation:none; } }

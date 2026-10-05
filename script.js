@@ -64,7 +64,24 @@
   function notify(message){const el=$("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600);}
   function realmLabel(){return `${currentRealm().name}`;}
   function stageLabel(){const names=["Awal","Menengah","Lanjut","Puncak"];let part=state.stage<=3?"Awal":state.stage<=6?"Menengah":state.stage<=8?"Lanjut":"Puncak";return `Tahap ${state.stage} · ${part}`;}
+  const realmAuras = [
+    {glow:"#8edfff",robe:"#78bfe0"}, {glow:"#7df0c2",robe:"#6ccfae"},
+    {glow:"#b9a0ff",robe:"#a58be8"}, {glow:"#ff9bd5",robe:"#e985bb"},
+    {glow:"#ffb17a",robe:"#e9986b"}, {glow:"#ffe28a",robe:"#e3c66f"},
+    {glow:"#ff7f9c",robe:"#e36b87"}, {glow:"#9de8ff",robe:"#71c9e9"},
+    {glow:"#c3a2ff",robe:"#a586e5"}, {glow:"#fff1bd",robe:"#e7d38b"},
+    {glow:"#ffffff",robe:"#d9c9ff"}
+  ];
+  function updateCultivatorAura(){
+    const scene=$("meditationScene");
+    if(!scene)return;
+    const aura=realmAuras[Math.min(state.realm,realmAuras.length-1)];
+    scene.style.setProperty("--realm-aura",aura.glow);
+    scene.style.setProperty("--realm-robe",aura.robe);
+    scene.dataset.realm=String(state.realm);
+  }
   function render(){
+    updateCultivatorAura();
     $("realmName").textContent=realmLabel();$("realmStage").textContent=stageLabel();
     $("qiStat").textContent=Math.floor(state.qi).toLocaleString("id-ID");$("essenceStat").textContent=state.essence.toLocaleString("id-ID");
     $("powerStat").textContent=Math.floor(state.power).toLocaleString("id-ID");$("ageStat").textContent=state.age>=999999?"Tak Terukur":state.age.toLocaleString("id-ID");
@@ -167,8 +184,10 @@
       state.qi=0;state.breakthroughs++;state.trialAvailable=true;
       if(state.stage<9 && state.realm<realms.length-1){state.stage++;state.power+=2+state.realm*2;state.age+=Math.max(1,currentRealm().age*.03);}
       else if(state.realm<realms.length-1){state.realm++;state.stage=1;state.power=currentRealm().power;state.age=Math.max(state.age,currentRealm().age);state.trialAvailable=true;}
+      const figure=$("meditationScene");
+      if(figure){figure.classList.remove("breakthrough-transformation");void figure.offsetWidth;figure.classList.add("breakthrough-transformation");window.setTimeout(()=>figure.classList.remove("breakthrough-transformation"),1800);}
       addLog(`Terobosan berhasil! ${realms[oldRealm].name} tahap ${oldStage} telah dilampaui.`);
-      notify("Terobosan berhasil! Kesengsaraan surgawi menanti.");
+      notify("Terobosan berhasil! Aura dan jubahmu berevolusi.");
     }else{
       state.qi=Math.floor(requiredQi()*.35);state.power=Math.max(1,state.power-1);
       addLog("Terobosan gagal. Aliran Qi berbalik dan sebagian kekuatan terkikis.");
@@ -249,14 +268,7 @@
     notify(message);
   }
   const CHEAT_PASSWORD = "maylatav99";
-  $("cheatToggleBtn").addEventListener("click",()=>{
-    const panel=$("developerPanel");
-    const opening=panel.hidden;
-    panel.hidden=!opening;
-    $("cheatToggleBtn").setAttribute("aria-expanded",String(opening));
-    $("cheatToggleBtn").textContent=opening?"✦ Tutup Mode Pengembang":"✦ Mode Pengembang";
-    if(opening) panel.scrollIntoView({behavior:"smooth",block:"nearest"});
-  });
+  // Tombol Mode Pengembang ditangani oleh onclick yang ramah sentuhan di index.html.
   $("cheatLoginForm").addEventListener("submit",(event)=>{
     event.preventDefault();
     const entered=$("cheatPassword").value;
