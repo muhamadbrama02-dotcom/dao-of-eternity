@@ -79,6 +79,14 @@
     scene.style.setProperty("--realm-aura",aura.glow);
     scene.style.setProperty("--realm-robe",aura.robe);
     scene.dataset.realm=String(state.realm);
+    const beasts=["🐺","🦅","🐍","🦊","🐉","🦄","🐲","🌌","🐉","👑","☯"];
+    const beastNames=["Spirit Wolf","Shadow Crow","Star Serpent","Flame Fox","Celestial Dragon","Moon Kirin","Heaven Dragon","Void Beast","Primordial Dragon","Dao Emperor Beast","Manifestation of Dao"];
+    const beast=$("spiritBeast");
+    if(beast){
+      beast.querySelector("strong").textContent=beasts[Math.min(state.realm,beasts.length-1)];
+      beast.querySelector("small").textContent=beastNames[Math.min(state.realm,beastNames.length-1)];
+      beast.classList.toggle("awakened",state.realm>=3);
+    }
   }
   function render(){
     updateCultivatorAura();
@@ -185,7 +193,17 @@
       if(state.stage<9 && state.realm<realms.length-1){state.stage++;state.power+=2+state.realm*2;state.age+=Math.max(1,currentRealm().age*.03);}
       else if(state.realm<realms.length-1){state.realm++;state.stage=1;state.power=currentRealm().power;state.age=Math.max(state.age,currentRealm().age);state.trialAvailable=true;}
       const figure=$("meditationScene");
-      if(figure){figure.classList.remove("breakthrough-transformation");void figure.offsetWidth;figure.classList.add("breakthrough-transformation");window.setTimeout(()=>figure.classList.remove("breakthrough-transformation"),1800);}
+      if(figure){
+        figure.classList.remove("breakthrough-transformation","heavenly-ascension");
+        void figure.offsetWidth;
+        figure.classList.add("breakthrough-transformation");
+        if(state.realm>=4) figure.classList.add("heavenly-ascension");
+        window.setTimeout(()=>figure.classList.remove("breakthrough-transformation","heavenly-ascension"),2300);
+      }
+      const beast=$("spiritBeast");
+      if(beast){beast.classList.remove("beast-awaken");void beast.offsetWidth;beast.classList.add("beast-awaken");window.setTimeout(()=>beast.classList.remove("beast-awaken"),2200);}
+      const scene2=$("meditationScene");
+      if(scene2 && state.realm>=4){scene2.classList.remove("dao-ascension");void scene2.offsetWidth;scene2.classList.add("dao-ascension");window.setTimeout(()=>scene2.classList.remove("dao-ascension"),2200); }
       addLog(`Terobosan berhasil! ${realms[oldRealm].name} tahap ${oldStage} telah dilampaui.`);
       notify("Terobosan berhasil! Aura dan jubahmu berevolusi.");
     }else{

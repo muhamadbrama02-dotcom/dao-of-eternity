@@ -412,3 +412,73 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 @keyframes transcendSigil { 0%,100% { transform:translate(-50%,-50%) scale(1); } 35% { transform:translate(-50%,-50%) scale(1.55) rotate(45deg); filter:brightness(2.2); } 70% { transform:translate(-50%,-50%) scale(1.15) rotate(0deg); } }
 @keyframes transcendHalo { 0% { opacity:.9; transform:translate(-50%,-50%) scale(.65); } 100% { opacity:0; transform:translate(-50%,-50%) scale(2.5); } }
 @media (prefers-reduced-motion: reduce) { .meditation-scene .robe-flow,.meditation-scene .hair-flow { animation:none; } }
+
+
+/* === V4: HEAVENLY ASCENSION — evolving world, awakened eyes, spirit beast === */
+.meditation-scene {
+  --realm-aura:#8edfff; --realm-robe:#78bfe0;
+  transition:background 1.1s ease, box-shadow 1.1s ease;
+  background:
+    radial-gradient(circle at 50% 43%, color-mix(in srgb, var(--realm-aura) 19%, transparent) 0%, transparent 34%),
+    radial-gradient(ellipse at 50% 56%, color-mix(in srgb, var(--realm-robe) 24%, #354577) 0%, #19264a 32%, #0b1228 72%);
+}
+.meditation-scene[data-realm="0"] { background:radial-gradient(ellipse at 50% 56%,#354577 0%,#19264a 32%,#0b1228 70%); }
+.meditation-scene[data-realm="1"] { background:radial-gradient(ellipse at 50% 56%,#254d50 0%,#152e3b 34%,#081622 72%); }
+.meditation-scene[data-realm="2"] { background:radial-gradient(ellipse at 50% 56%,#4a3569 0%,#211d48 34%,#0c1027 72%); }
+.meditation-scene[data-realm="3"] { background:radial-gradient(ellipse at 50% 56%,#5b3158 0%,#281a42 34%,#0b1028 72%); }
+.meditation-scene[data-realm="4"] { background:radial-gradient(ellipse at 50% 56%,#65402b 0%,#302038 34%,#0d1025 72%); }
+.meditation-scene[data-realm="5"] { background:radial-gradient(ellipse at 50% 56%,#62522a 0%,#33283a 34%,#111326 72%); }
+.meditation-scene[data-realm="6"] { background:radial-gradient(ellipse at 50% 56%,#632c42 0%,#321a38 34%,#100e23 72%); }
+.meditation-scene[data-realm="7"] { background:radial-gradient(ellipse at 50% 56%,#254f65 0%,#172d4b 34%,#081324 72%); }
+.meditation-scene[data-realm="8"] { background:radial-gradient(ellipse at 50% 56%,#4b3370 0%,#241c4b 34%,#0b0d22 72%); }
+.meditation-scene[data-realm="9"] { background:radial-gradient(ellipse at 50% 56%,#66552e 0%,#3b2b38 34%,#121221 72%); }
+.meditation-scene[data-realm="10"] { background:radial-gradient(ellipse at 50% 56%,#8a7ac0 0%,#40355e 30%,#151326 68%,#05050c 100%); }
+
+.figure-eyes { position:absolute; z-index:6; left:50%; top:25.5%; width:31px; height:8px; transform:translateX(-50%); display:flex; justify-content:space-between; opacity:.38; transition:opacity .7s, filter .7s; }
+.figure-eyes i { display:block; width:9px; height:3px; border-radius:50%; background:var(--realm-aura); box-shadow:0 0 4px var(--realm-aura); transform:rotate(-7deg); }
+.figure-eyes i:last-child { transform:rotate(7deg); }
+.meditation-scene[data-realm="3"] .figure-eyes,
+.meditation-scene[data-realm="4"] .figure-eyes,
+.meditation-scene[data-realm="5"] .figure-eyes,
+.meditation-scene[data-realm="6"] .figure-eyes,
+.meditation-scene[data-realm="7"] .figure-eyes,
+.meditation-scene[data-realm="8"] .figure-eyes,
+.meditation-scene[data-realm="9"] .figure-eyes,
+.meditation-scene[data-realm="10"] .figure-eyes { opacity:.92; filter:drop-shadow(0 0 6px var(--realm-aura)); }
+.figure-crown { position:absolute; z-index:6; left:50%; top:5%; transform:translateX(-50%) scale(.7); color:var(--realm-aura); font-size:15px; opacity:.35; text-shadow:0 0 10px var(--realm-aura); animation:crownFloat 3.4s ease-in-out infinite; transition:color .7s, opacity .7s; }
+.meditation-scene[data-realm="6"] .figure-crown,
+.meditation-scene[data-realm="7"] .figure-crown,
+.meditation-scene[data-realm="8"] .figure-crown,
+.meditation-scene[data-realm="9"] .figure-crown,
+.meditation-scene[data-realm="10"] .figure-crown { opacity:.95; transform:translateX(-50%) scale(1); }
+
+.spirit-beast { position:absolute; z-index:4; left:50%; top:50%; width:112px; height:112px; transform:translate(-50%,-50%) scale(.55); opacity:.04; pointer-events:none; display:grid; place-items:center; transition:opacity .8s, transform .8s; }
+.spirit-beast strong { font-size:48px; filter:drop-shadow(0 0 10px var(--realm-aura)); text-shadow:0 0 18px var(--realm-aura); }
+.spirit-beast small { position:absolute; bottom:4px; color:var(--realm-aura); font-size:7px; letter-spacing:2px; opacity:.8; }
+.beast-ring { position:absolute; inset:7px; border:1px solid color-mix(in srgb,var(--realm-aura) 55%,transparent); border-radius:50%; box-shadow:inset 0 0 18px color-mix(in srgb,var(--realm-aura) 20%,transparent),0 0 22px color-mix(in srgb,var(--realm-aura) 18%,transparent); animation:beastSpin 10s linear infinite; }
+.spirit-beast.awakened { opacity:.17; transform:translate(-50%,-50%) scale(.9); }
+.spirit-beast.beast-awaken { animation:beastAwaken 2.1s ease-out; }
+.heaven-gate { position:absolute; z-index:1; left:50%; top:42%; width:170px; height:170px; border:1px solid color-mix(in srgb,var(--realm-aura) 18%,transparent); border-radius:50%; transform:translate(-50%,-50%) scale(.6); opacity:.08; box-shadow:0 0 40px color-mix(in srgb,var(--realm-aura) 12%,transparent), inset 0 0 30px color-mix(in srgb,var(--realm-aura) 10%,transparent); animation:gatePulse 5.5s ease-in-out infinite; }
+.heaven-gate span { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); color:var(--realm-aura); font-size:46px; opacity:.45; }
+.meditation-scene[data-realm="7"] .heaven-gate,
+.meditation-scene[data-realm="8"] .heaven-gate,
+.meditation-scene[data-realm="9"] .heaven-gate,
+.meditation-scene[data-realm="10"] .heaven-gate { opacity:.18; transform:translate(-50%,-50%) scale(.95); }
+.dao-ascension { animation:daoAscension 2.2s ease-out !important; }
+.meditation-scene.dao-ascension .heaven-gate { animation:gateOpen 2.2s ease-out; }
+.meditation-scene.dao-ascension .spirit-beast { opacity:.65; transform:translate(-50%,-50%) scale(1.35); }
+.meditation-scene.dao-ascension .figure-eyes { opacity:1; filter:brightness(2) drop-shadow(0 0 10px var(--realm-aura)); }
+.meditation-scene.dao-ascension .figure-crown { opacity:1; animation:crownAscend 2.2s ease-out; }
+.heavenly-ascension .cultivator-svg { animation:heavenlyGlow 2.2s ease-out; }
+.heavenly-ascension .figure-eyes { animation:eyeAwaken 2.2s ease-out; }
+@keyframes crownFloat {0%,100%{translate:0 0;rotate:-4deg}50%{translate:0 -4px;rotate:4deg}}
+@keyframes crownAscend {0%{transform:translateX(-50%) scale(.7);opacity:.2}35%{transform:translateX(-50%) translateY(-18px) scale(1.8);opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
+@keyframes eyeAwaken {0%,100%{opacity:.5;transform:translateX(-50%) scaleX(1)}35%{opacity:1;transform:translateX(-50%) scaleX(1.8);filter:brightness(2.5)}}
+@keyframes beastSpin {to{rotate:360deg}}
+@keyframes beastAwaken {0%{opacity:.05;transform:translate(-50%,-50%) scale(.5)}30%{opacity:.8;transform:translate(-50%,-50%) scale(1.45)}65%{opacity:.35;transform:translate(-50%,-50%) scale(1.05)}100%{opacity:.17;transform:translate(-50%,-50%) scale(.9)}}
+@keyframes gatePulse {0%,100%{scale:.92;opacity:.08}50%{scale:1.02;opacity:.18}}
+@keyframes gateOpen {0%{scale:.5;opacity:.05;rotate:-15deg}45%{scale:1.45;opacity:.45;rotate:8deg}100%{scale:1;opacity:.18;rotate:0}}
+@keyframes heavenlyGlow {0%,100%{filter:drop-shadow(0 0 10px var(--realm-aura))}35%{filter:brightness(2) drop-shadow(0 0 35px var(--realm-aura)) drop-shadow(0 0 55px var(--realm-robe))}65%{filter:brightness(1.35) drop-shadow(0 0 20px var(--realm-aura))}}
+@keyframes daoAscension {0%,100%{filter:brightness(1);box-shadow:inset 0 0 50px transparent}25%{filter:brightness(1.7) saturate(1.3);box-shadow:inset 0 0 90px color-mix(in srgb,var(--realm-aura) 28%,transparent)}55%{filter:brightness(1.25);box-shadow:inset 0 0 120px color-mix(in srgb,var(--realm-aura) 18%,transparent)}}
+@media (max-width:380px){.spirit-beast{width:90px;height:90px}.spirit-beast strong{font-size:39px}.heaven-gate{width:140px;height:140px}.figure-crown{top:7%}}
+@media (prefers-reduced-motion: reduce){.figure-crown,.spirit-beast,.heaven-gate{animation:none}.meditation-scene.dao-ascension{animation:none !important}}
