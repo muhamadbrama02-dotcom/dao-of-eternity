@@ -330,3 +330,52 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; }
 }
+
+
+/* V3.1 performance pass + optional local developer cheats */
+.meditation-scene .qi-stream { will-change: transform, opacity; }
+.meditation-scene .cultivator-figure,
+.meditation-scene .figure-aura,
+.meditation-scene .aura-halo,
+.meditation-scene .orbit { will-change: transform, opacity; }
+.meditation-scene.meditating-burst .qi-stream { opacity: .45; }
+.meditation-scene.meditating-burst .figure-aura { animation-duration: .42s; }
+.developer-toggle {
+  display:block; margin:18px auto 8px; padding:10px 14px;
+  border:1px solid #bca66a44; border-radius:999px; color:#c9b77f;
+  background:#11182d99; font-size:12px; letter-spacing:.5px;
+}
+.developer-toggle:active { transform:scale(.98); }
+.developer-panel {
+  margin:12px 0 18px; padding:18px; border:1px solid #c4a8ff44;
+  border-radius:18px; background:linear-gradient(145deg,#171d38,#0e1429);
+  box-shadow:0 0 28px #9f8cff0c;
+}
+.developer-panel[hidden] { display:none !important; }
+.developer-panel h2 { margin:4px 0 0; }
+.developer-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.developer-actions button { min-height:44px; padding:10px; border:1px solid #bba6ed44; border-radius:11px; color:#e4def6; background:#202746; font-size:12px; }
+.developer-actions button:last-child { grid-column:1/-1; }
+.developer-actions button:active { transform:scale(.98); background:#30385e; }
+.developer-note { margin:12px 0 0; color:#8993b2; font-size:11px; line-height:1.6; }
+@media (max-width:380px) {
+  .developer-panel { padding:14px; }
+  .developer-actions { grid-template-columns:1fr; }
+  .developer-actions button:last-child { grid-column:auto; }
+}
+
+
+/* V3.2 password gate for the local developer panel */
+.cheat-login { margin-top:14px; display:grid; gap:8px; }
+.cheat-login label { color:#c3cbe5; font-size:12px; letter-spacing:.4px; }
+.cheat-login-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
+.cheat-login input {
+  min-width:0; width:100%; box-sizing:border-box; padding:12px 13px;
+  border:1px solid #bba6ed55; border-radius:11px; background:#090f20;
+  color:#f1f3ff; font:inherit; font-size:14px; outline:none;
+}
+.cheat-login input:focus { border-color:#e7ca83; box-shadow:0 0 0 3px #e7ca831b; }
+.cheat-login-row button { min-width:74px; }
+.cheat-login-message { min-height:16px; margin:0; color:#e9b8b8; font-size:12px; }
+.developer-lock { margin-top:12px; padding:8px 0; border:0; background:transparent; color:#c9b77f; font-size:12px; text-decoration:underline; }
+#cheatTools[hidden], #cheatLoginForm[hidden] { display:none !important; }

@@ -179,6 +179,31 @@
     <footer class="footer">
       <span>☯ DAO OF ETERNITY</span>
       <span>Setiap bintang menyimpan sebuah Dao.</span>
+      <button id="cheatToggleBtn" class="developer-toggle" aria-expanded="false" aria-controls="developerPanel">✦ Mode Pengembang</button>
+      <section id="developerPanel" class="developer-panel" hidden>
+        <div class="section-heading"><div><label>LOCAL SANDBOX</label><h2>Panel Cheat</h2></div><span class="section-icon">⚡</span></div>
+        <p class="section-copy">Masukkan password untuk membuka fitur pengembang.</p>
+        <form id="cheatLoginForm" class="cheat-login">
+          <label for="cheatPassword">Password pengembang</label>
+          <div class="cheat-login-row">
+            <input id="cheatPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+            <button type="submit" class="secondary-button">Buka</button>
+          </div>
+          <p id="cheatLoginMessage" class="cheat-login-message" role="status" aria-live="polite"></p>
+        </form>
+        <div id="cheatTools" hidden>
+        <p class="section-copy">Akses terbuka. Perubahan tersimpan di browser ini.</p>
+        <div class="developer-actions">
+          <button id="cheatQiBtn" class="secondary-button">+10.000 Qi</button>
+          <button id="cheatEssenceBtn" class="secondary-button">+1.000 Esensi</button>
+          <button id="cheatPowerBtn" class="secondary-button">+5.000 Kekuatan</button>
+          <button id="cheatRealmBtn" class="secondary-button">Buka Puncak Dao</button>
+          <button id="cheatUnlockBtn" class="secondary-button">Buka Semua Teknik</button>
+        </div>
+        <button id="cheatLockBtn" class="developer-lock">Kunci kembali panel cheat</button>
+        <p class="developer-note">Catatan: password ini hanya mengunci tampilan antarmuka. Karena game berjalan di browser, password dapat ditemukan oleh orang yang memeriksa source code.</p>
+        </div>
+      </section>
       <button id="resetBtn" class="reset-button">Mulai Perjalanan Baru</button>
     </footer>
   </main>

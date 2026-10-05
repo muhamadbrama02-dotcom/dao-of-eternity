@@ -110,8 +110,11 @@
     $("fightBtn").textContent=state.enemyHp<=0?"✦ Cari Musuh Berikutnya":"⚔  Mulai Pertarungan";
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-  function spawnQiParticles(count=18, burst=false){
+  let sceneEffectTimer = null;
+  function spawnQiParticles(count=8, burst=false){
     const layer=$("meditationParticles");if(!layer)return;
+    // Hard cap keeps repeated clicks from stacking too many animated DOM nodes.
+    count = Math.min(count, burst ? 12 : 4);
     const glyphs=["✦","✧","·","✺","◇"];
     const colors=["#f1dda7","#a9c6ff","#c9b4ff","#8ee2d0"];
     for(let i=0;i<count;i++){
@@ -127,16 +130,15 @@
       layer.appendChild(p);
       p.addEventListener("animationend",()=>p.remove(),{once:true});
     }
-    if(burst && layer.children.length>70){
-      while(layer.children.length>70) layer.firstElementChild.remove();
-    }
+    while(layer.children.length>16) layer.firstElementChild.remove();
   }
-  function sceneEffect(className, duration=1100){
+  function sceneEffect(className, duration=700){
     const scene=$("meditationScene");if(!scene)return;
+    if(sceneEffectTimer) window.clearTimeout(sceneEffectTimer);
     scene.classList.remove("meditating-burst","breakthrough-burst","trial-burst");
     void scene.offsetWidth;
     scene.classList.add(className);
-    window.setTimeout(()=>scene.classList.remove(className),duration);
+    sceneEffectTimer=window.setTimeout(()=>scene.classList.remove(className),duration);
   }
   function pulseStats(){
     ["qiStat","essenceStat","powerStat"].forEach(id=>{
@@ -150,7 +152,8 @@
     const gain=meditateGain();const before=state.qi;state.qi=Math.min(requiredQi(),state.qi+gain);const actual=Math.floor(state.qi-before);
     state.totalQi+=actual;state.meditations++;state.age+=0.01;
     addLog(`Meditasi berhasil. Kamu menyerap ${actual} Qi dari arus spiritual.`);
-    sceneEffect("meditating-burst",950);spawnQiParticles(20,true);pulseStats();
+    // Meditation uses a tiny pulse and only a few particles; the ambient aura stays CSS-only.
+    sceneEffect("meditating-burst",420);spawnQiParticles(3,false);
     const caption=$("meditationCaption");
     if(caption){caption.textContent=["Qi mengalir melalui meridian...","Aura Dao semakin kuat...","Bintang-bintang menjawab panggilanmu..."][state.meditations%3];}
     render();if(state.qi>=requiredQi())notify("Qi mencapai batas! Kamu siap melakukan terobosan.");
@@ -158,7 +161,7 @@
   function breakthrough(){
     if(state.qi<requiredQi())return;
     const oldRealm=state.realm,oldStage=state.stage;
-    sceneEffect("breakthrough-burst",1150);spawnQiParticles(34,true);
+    sceneEffect("breakthrough-burst",850);spawnQiParticles(12,true);
     const roll=Math.random();
     if(roll<0.72){
       state.qi=0;state.breakthroughs++;state.trialAvailable=true;
@@ -176,7 +179,7 @@
   function faceTrial(){
     if(!state.trialAvailable)return;
     const roll=Math.random()*100,success=roll<chance();
-    sceneEffect("trial-burst",800);spawnQiParticles(24,true);
+    sceneEffect("trial-burst",650);spawnQiParticles(10,true);
     state.trialAvailable=false;
     if(success){
       const reward=15+state.realm*8;state.essence+=reward;state.essenceEarned+=reward;state.power+=5+state.realm*3;
@@ -218,7 +221,7 @@
     if(state.enemyHp<=0){state.enemyIndex++;state.enemyHp=100;renderEnemy();notify("Musuh baru muncul dari kabut.");return;}
     const enemy=enemyTypes[state.enemyIndex%enemyTypes.length];const enemyPower=enemy.power+state.realm*3;
     const damage=Math.max(8,Math.floor(state.power*1.4+Math.random()*12));
-    sceneEffect("breakthrough-burst",650);spawnQiParticles(12,true);
+    sceneEffect("breakthrough-burst",500);spawnQiParticles(6,true);
     state.enemyHp=Math.max(0,state.enemyHp-damage);
     let message=`Seranganmu menghasilkan ${damage}% kerusakan pada ${enemy.name}.`;
     if(state.enemyHp<=0){
@@ -238,6 +241,64 @@
     else{state.sectJoined=true;state.sect="Paviliun Bintang Abadi";state.essence+=10;state.essenceEarned+=10;addLog("Kamu bergabung dengan Paviliun Bintang Abadi dan menerima 10 Esensi Dao sebagai sambutan.");notify("Selamat datang di Paviliun Bintang Abadi!");}
     render();
   }
+  function useCheat(message, mutate){
+    mutate();
+    addLog(`[Mode Pengembang] ${message}`);
+    save();
+    render();
+    notify(message);
+  }
+  const CHEAT_PASSWORD = "maylatav99";
+  $("cheatToggleBtn").addEventListener("click",()=>{
+    const panel=$("developerPanel");
+    const opening=panel.hidden;
+    panel.hidden=!opening;
+    $("cheatToggleBtn").setAttribute("aria-expanded",String(opening));
+    $("cheatToggleBtn").textContent=opening?"✦ Tutup Mode Pengembang":"✦ Mode Pengembang";
+    if(opening) panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+  $("cheatLoginForm").addEventListener("submit",(event)=>{
+    event.preventDefault();
+    const entered=$("cheatPassword").value;
+    const message=$("cheatLoginMessage");
+    if(entered===CHEAT_PASSWORD){
+      $("cheatTools").hidden=false;
+      $("cheatLoginForm").hidden=true;
+      message.textContent="";
+      $("cheatPassword").value="";
+      notify("Panel cheat berhasil dibuka.");
+    }else{
+      message.textContent="Password salah. Coba lagi.";
+      $("cheatPassword").value="";
+      $("cheatPassword").focus();
+    }
+  });
+  $("cheatLockBtn").addEventListener("click",()=>{
+    $("cheatTools").hidden=true;
+    $("cheatLoginForm").hidden=false;
+    $("cheatLoginMessage").textContent="Panel dikunci kembali.";
+    $("cheatPassword").value="";
+  });
+  $("cheatQiBtn").addEventListener("click",()=>useCheat("Qi bertambah 10.000.",()=>{
+    state.qi=Math.min(requiredQi(),state.qi+10000);
+    state.totalQi+=10000;
+  }));
+  $("cheatEssenceBtn").addEventListener("click",()=>useCheat("Esensi Dao bertambah 1.000.",()=>{
+    state.essence+=1000;state.essenceEarned+=1000;
+  }));
+  $("cheatPowerBtn").addEventListener("click",()=>useCheat("Kekuatan bertambah 5.000.",()=>{
+    state.power+=5000;
+  }));
+  $("cheatRealmBtn").addEventListener("click",()=>useCheat("Ranah Puncak Dao terbuka.",()=>{
+    state.realm=realms.length-1;state.stage=1;state.qi=0;
+    state.power=Math.max(state.power,currentRealm().power);
+    state.age=Math.max(state.age,currentRealm().age);
+    state.trialAvailable=true;
+  }));
+  $("cheatUnlockBtn").addEventListener("click",()=>useCheat("Semua teknik kultivasi terbuka.",()=>{
+    state.ownedTechniques=techniques.map(t=>t.id);
+  }));
+
   $("meditateBtn").addEventListener("click",meditate);
   $("breakthroughBtn").addEventListener("click",breakthrough);
   $("trialBtn").addEventListener("click",faceTrial);
@@ -251,9 +312,4 @@
   $("soundlessMark").addEventListener("click",()=>notify("Dao tidak bersuara, tetapi selalu menunjukkan jalan."));
   addLog("Perjalanan kultivasimu dimulai. Semoga Dao menuntun langkahmu.");
   render();
-  window.setTimeout(()=>spawnQiParticles(10),450);
-  window.setInterval(()=>{
-    if(document.hidden)return;
-    spawnQiParticles(2);
-  },1700);
 })();
